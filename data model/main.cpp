@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include "./data_model_lib/dataModelLib.h"
 
 int main(int argc, const char * argv[]) {
     // insert code here...

@@ -17,9 +17,6 @@ struct attributeSchema{
     string name;
 };
 
-// -- global table
-//map<string,Source_ERD_schema*> Source_ERD_table;
-
 class originalERDSchema
 {
 public:

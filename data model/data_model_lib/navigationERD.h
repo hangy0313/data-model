@@ -5,7 +5,7 @@
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
 
-using namespace std ;
+using namespace std;
 
 class navigationERD;
 class navigationEntity;
@@ -13,7 +13,7 @@ class navigationEntity;
 
 struct keySchema{
     string type;
-    string attributeName;
+    list<string> attributeList;
 };
 
 class navigationERD : public cardinalityERD
@@ -39,8 +39,9 @@ public:
     ~navigationEntity();
 
     void addKey(keySchema key);
-    void addKey(string type, string name);
-    keySchema getKey(string name);
+    void addPrimaryKey(string keyName);
+    string getPrimaryKey();
+    void addMultiKey(list<string> attList);
     list<keySchema> getKeyList();
 protected:
     list<keySchema> keyList;

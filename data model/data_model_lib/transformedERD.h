@@ -5,7 +5,7 @@
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
 
-using namespace std ;
+using namespace std;
 
 class specializeERD;
 class specializeEntity;

@@ -4,6 +4,7 @@
 #include "../universal_data_lib/universal_data_lib.h"
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -60,5 +61,8 @@ public:
 protected:
     struct cardinalitySchema cardinality;
 };
+
+list<cardinalityRole> importCardinalityInfo();
+cardinalityERD* transferToCardinalityERD(originalERDSchema *erd);
 
 #endif

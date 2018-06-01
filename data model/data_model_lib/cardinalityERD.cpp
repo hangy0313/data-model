@@ -140,3 +140,73 @@ struct cardinalitySchema cardinalityRole::getCardinality()
 {
     return cardinality;
 }
+
+list<cardinalityRole> importCardinalityInfo()
+{
+    ifstream cardinalityInput("./erdScript/cardinality.txt");
+    
+    list<cardinalityRole> tmpRoleList;
+    cardinalityRole tmpRole;
+    string roleName, minNumString, maxNumString;
+    
+    while(cardinalityInput >> roleName){
+        cardinalityInput >> minNumString;
+        cardinalityInput >> maxNumString;
+
+        tmpRole.setRoleName(roleName);
+        tmpRole.setCardinality(stoi(minNumString), stoi(maxNumString));
+        
+        tmpRoleList.push_back(tmpRole);
+    }
+    
+    return tmpRoleList;
+}
+
+cardinalityERD* transferToCardinalityERD(originalERDSchema *erd)
+{
+    cardinalityERD* newERD = new cardinalityERD(erd->get_ERD_name());
+    
+    //import cardinality info
+    list<cardinalityRole> carRoleList = importCardinalityInfo();
+    
+    //duplicate entity list
+    list<entitySchema>::iterator entityIter;
+    list<entitySchema>::iterator entityBegin = erd->getEntityList().begin();
+    list<entitySchema>::iterator entityEnd = erd->getEntityList().end();
+    for(entityIter = entityBegin;entityIter != entityEnd;entityIter++){
+        newERD->addEntity(*entityIter);
+    }
+    
+    //relationshipSchema to cardinalityRelationship
+    list<relationshipSchema>::iterator relationIter;
+    list<relationshipSchema>::iterator relationBegin = erd->getRelationshipList().begin();
+    list<relationshipSchema>::iterator relationEnd = erd->getRelationshipList().end();
+    
+    list<cardinalityRole>::iterator carIter;
+    
+    for(relationIter = relationBegin;relationIter != relationEnd;relationIter++){
+        cardinalityRelationship* tmpRelation = new cardinalityRelationship((*relationIter).getRelationshipName());
+        
+        //foreach role in the relationship
+        list<roleSchema> roleList = (*relationIter).getRoleList();
+        list<roleSchema>::iterator roleIter;
+        for(roleIter = roleList.begin();roleIter != roleList.end();roleIter++){
+            //foreach role from cardinality info
+            bool update = false;
+            for(carIter = carRoleList.begin();carIter != carRoleList.end();carIter++){
+                if((*carIter).getRoleName() == (*roleIter).getRoleName()){
+                    tmpRelation->addRoleSchema((*carIter));
+                    update = true;
+                }
+            }
+            if(!update){
+                cardinalityRole tmpCarRole;
+                tmpCarRole.setRoleName((*roleIter).getRoleName());
+                tmpRelation->addRoleSchema(tmpCarRole);
+            }
+        }
+        newERD->addRelationship(*tmpRelation);
+    }
+    
+    return newERD;
+}

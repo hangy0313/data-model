@@ -7,10 +7,24 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include "./data_model_lib/dataModelLib.h"
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+using namespace std;
+
+int main()
+{
+//    /*
+//     *  test importCardinalityInfo()
+//     */
+//    list<cardinalityRole> tmpRoleList = importCardinalityInfo();
+//    list<cardinalityRole>::iterator iter;
+//    
+//    for(iter = tmpRoleList.begin();iter != tmpRoleList.end();iter++){
+//        cout << (*iter).getRoleName() << endl;
+//        cout << (*iter).getCardinality().minNum << endl;
+//        cout << (*iter).getCardinality().maxNum << endl;
+//    }
+    
     return 0;
 }

@@ -7,98 +7,93 @@
 
 using namespace std;
 
-class originalERDSchema;
-class entitySchema;
-class relationshipSchema;
-class roleSchema;
+class ERD;
+class Entity;
+class Relationship;
+class Role;
 
 struct attributeSchema{
     string type;
     string name;
 };
 
-class originalERDSchema
+/*
+ *  member data : name, entity table, relationship table
+ */
+class ERD : public Attribute_List
 {
 public:
-    originalERDSchema();
-    originalERDSchema(string erdName);
-    ~originalERDSchema();
+    ERD(string erdName);
+    ~ERD();
 
-    string get_ERD_name();
-    list<entitySchema> getEntityList();
-    list<relationshipSchema> getRelationshipList();
-    void addEntity(entitySchema entity);
+    void setERDName(string erdName);
+    string getERDName();
+    Map* getEntityTable();
+    Map* getRelationshipTable();
+    void addEntity(Entity* en);
     void removeEntity(string entityName);
-    void addRelationship(relationshipSchema relationship);
+    void addRelationship(Relationship* relationship);
     void removeRelationship(string relationshipName);
-    entitySchema find_Entity(string entityName);
-    relationshipSchema find_Relationship(string relationshipName);
-protected:
-    string erdName;
-    list<entitySchema> entityList;
-    list<relationshipSchema> relationshipList;
+    Entity* findEntity(string entityName);
+    Relationship* findRelationship(string relationshipName);
 };
 
-class entitySchema
+/*
+ *  member data : name, attribute set
+ */
+class Entity : public Attribute_List
 {
 public:
-    entitySchema();
-    entitySchema(string entityName);
-    ~entitySchema();
+    Entity();
+    Entity(string entityName);
+    ~Entity();
     
     void setEntityName(string entityName);
     string getEntityName();
     
     void addAttribute(string attributeName,string attributeType);
-    void addAttribute(attributeSchema tmpAttribute);
+    void addAttribute(Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
-    list<attributeSchema> getAttributeList();
-protected:
-    string name;
-    list<attributeSchema> attributeList;
+    Attribute_List* getAttributeList();
 };
 
-class relationshipSchema
+/*
+ *  member data : name, role set
+ */
+class Relationship : public Attribute_List
 {
 public:
-    relationshipSchema();
-    relationshipSchema(string relationshipName);
-    ~relationshipSchema();
+    Relationship();
+    Relationship(string relationshipName);
+    ~Relationship();
     
     void setRelationshipName(string relationshipName);
     string getRelationshipName();
     
-    void setDegree(int degree);
-    int getDegree();
-    
-    void addRoleSchema(roleSchema role);
-    void addRoleSchema(string role,string entityName);
+    void addRole(Role role);
+    void addRole(string roleName,string entityName);
     void removeRole(string roleName);
-    list<roleSchema> getRoleList();
+    Attribute_List* getRoleList();
     
     string findEntityByRole(string roleName);
-    roleSchema findRole(string roleName);
-protected:
-    string name;
-    int degree;
-    list<roleSchema> roleList;
+    Role findRole(string roleName);
 };
 
-class roleSchema
+/*
+ *  member data : name, entity name
+ */
+class Role : public Attribute_List
 {
 public:
-    roleSchema();
-    roleSchema(string roleName);
-    ~roleSchema();
+    Role();
+    Role(string roleName);
+    ~Role();
     
     void setRoleName(string roleName);
     string getRoleName();
     
     void setEntityName(string entityName);
     string getEntityName();
-protected:
-    string name;
-    string entityName;
 };
 
 #endif

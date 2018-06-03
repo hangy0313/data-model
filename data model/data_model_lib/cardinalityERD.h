@@ -8,61 +8,20 @@
 
 using namespace std;
 
-class cardinalityERD;
-class cardinalityRelationship;
-class cardinalityRole;
-
 struct cardinalitySchema{
+    string roleName;
     int minNum;
     int maxNum;
 };
 
-class cardinalityERD : public originalERDSchema
-{
-public:
-    cardinalityERD();
-    cardinalityERD(string erdName);
-    ~cardinalityERD();
-    
-    list<cardinalityRelationship> getCardinalityRelationList();
-    void addRelationship(cardinalityRelationship relationship);
-    void removeCardinalityRelation(string relationshipName);
-    cardinalityRelationship findCardinalityRelation(string relationshipName);
-protected:
-    list<cardinalityRelationship> cardinalityRelationList;
-};
+/*
+ *  import cardinality info
+ */
+list<cardinalitySchema> importCardinalityInfo(ERD erd);
 
-class cardinalityRelationship : public relationshipSchema
-{
-public:
-    cardinalityRelationship();
-    cardinalityRelationship(string relationshipName);
-    ~cardinalityRelationship();
-    
-    void addRoleSchema(cardinalityRole role);
-    void addRoleSchema(string roleName,string entityName, int minNum, int maxNum);
-    void removeRole(string roleName);
-    list<cardinalityRole> getcardinalityRoleList();
-    string findEntityByRole(string roleName);
-    cardinalityRole findRole(string roleName);
-protected:
-    list<cardinalityRole> cardinalityRoleList;
-};
-
-class cardinalityRole : public roleSchema
-{
-public:
-    cardinalityRole();
-    cardinalityRole(string roleName);
-    ~cardinalityRole();
-    
-    void setCardinality(int minNum, int maxNum);
-    struct cardinalitySchema getCardinality();
-protected:
-    struct cardinalitySchema cardinality;
-};
-
-list<cardinalityRole> importCardinalityInfo();
-cardinalityERD* transferToCardinalityERD(originalERDSchema *erd);
+/*
+ *  Role add data member : Cardinality(Minimum, Maximum)
+ */
+void addCardinalityToERD();
 
 #endif

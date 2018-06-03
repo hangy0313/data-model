@@ -2,211 +2,63 @@
 
 using namespace std;
 
-cardinalityERD::cardinalityERD():originalERDSchema()
-{
-}
-
-cardinalityERD::cardinalityERD(string erdName):originalERDSchema(erdName)
-{
-}
-
-cardinalityERD::~cardinalityERD()
-{
-}
-
-list<cardinalityRelationship> cardinalityERD::getCardinalityRelationList()
-{
-    return cardinalityRelationList;
-}
-
-void cardinalityERD::addRelationship(cardinalityRelationship relationship)
-{
-    cardinalityRelationList.push_back(relationship);
-}
-
-void cardinalityERD::removeCardinalityRelation(string relationshipName)
-{
-    list<cardinalityRelationship>::iterator relationIter;
-    
-    for(relationIter = cardinalityRelationList.begin();relationIter != cardinalityRelationList.end();relationIter++){
-        if((*relationIter).getRelationshipName() == relationshipName){
-            cardinalityRelationList.erase(relationIter);
-        }
-    }
-}
-
-cardinalityRelationship cardinalityERD::findCardinalityRelation(string relationshipName)
-{
-    list<cardinalityRelationship>::iterator relationIter;
-    
-    for(relationIter = cardinalityRelationList.begin();relationIter != cardinalityRelationList.end();relationIter++){
-        if((*relationIter).getRelationshipName() == relationshipName){
-            return (*relationIter);
-        }
-    }
-    return (*relationIter);
-}
-
-
-cardinalityRelationship::cardinalityRelationship() : relationshipSchema()
-{
-}
-
-cardinalityRelationship::cardinalityRelationship(string relationshipName) : relationshipSchema(relationshipName)
-{
-}
-
-cardinalityRelationship::~cardinalityRelationship()
-{
-}
-
-
-
-void cardinalityRelationship::addRoleSchema(cardinalityRole role)
-{
-    cardinalityRoleList.push_back(role);
-}
-
-void cardinalityRelationship::addRoleSchema(string roleName,string entityName, int minNum, int maxNum)
-{
-    cardinalityRole tmp;
-    
-    tmp.setRoleName(roleName);
-    tmp.setEntityName(entityName);
-    tmp.setCardinality(minNum, maxNum);
-    
-    cardinalityRoleList.push_back(tmp);
-}
-
-void cardinalityRelationship::removeRole(string roleName)
-{
-    list<cardinalityRole>::iterator roleIter;
-    
-    for(roleIter = cardinalityRoleList.begin();roleIter != cardinalityRoleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            cardinalityRoleList.erase(roleIter);
-        }
-    }
-}
-
-list<cardinalityRole> cardinalityRelationship::getcardinalityRoleList()
-{
-    return cardinalityRoleList;
-}
-
-string cardinalityRelationship::findEntityByRole(string roleName)
-{
-    list<cardinalityRole>::iterator roleIter;
-    
-    for(roleIter = cardinalityRoleList.begin();roleIter != cardinalityRoleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            return (*roleIter).getEntityName();
-        }
-    }
-    
-    return "";
-}
-
-cardinalityRole cardinalityRelationship::findRole(string roleName)
-{
-    list<cardinalityRole>::iterator roleIter;
-    
-    for(roleIter = cardinalityRoleList.begin();roleIter != cardinalityRoleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            return (*roleIter);
-        }
-    }
-    return (*roleIter);
-}
-
-cardinalityRole::cardinalityRole() : roleSchema()
-{
-}
-
-cardinalityRole::cardinalityRole(string roleName) : roleSchema(roleName)
-{
-}
-
-cardinalityRole::~cardinalityRole()
-{
-}
-
-void cardinalityRole::setCardinality(int minNum, int maxNum)
-{
-    cardinality.minNum = minNum;
-    cardinality.maxNum = maxNum;
-}
-struct cardinalitySchema cardinalityRole::getCardinality()
-{
-    return cardinality;
-}
-
-list<cardinalityRole> importCardinalityInfo()
+/*
+ *  import cardinality info
+ */
+list<cardinalitySchema> importCardinalityInfo()
 {
     ifstream cardinalityInput("./erdScript/cardinality.txt");
     
-    list<cardinalityRole> tmpRoleList;
-    cardinalityRole tmpRole;
+    list<cardinalitySchema> tmpList;
+    cardinalitySchema tmp;
     string roleName, minNumString, maxNumString;
     
     while(cardinalityInput >> roleName){
         cardinalityInput >> minNumString;
         cardinalityInput >> maxNumString;
-
-        tmpRole.setRoleName(roleName);
-        tmpRole.setCardinality(stoi(minNumString), stoi(maxNumString));
         
-        tmpRoleList.push_back(tmpRole);
+        tmp.roleName = roleName;
+        tmp.minNum = stoi(minNumString);
+        tmp.maxNum = stoi(maxNumString);
+        
+        tmpList.push_back(tmp);
     }
     
-    return tmpRoleList;
+    return tmpList;
 }
 
-cardinalityERD* transferToCardinalityERD(originalERDSchema *erd)
+/*
+ *  Role add data member : Cardinality(Minimum, Maximum)
+ */
+void addCardinalityToERD(ERD erd)
 {
-    cardinalityERD* newERD = new cardinalityERD(erd->get_ERD_name());
+    list<cardinalitySchema> cardinalityList = importCardinalityInfo();
+    list<cardinalitySchema>::iterator cardinalityPtr;
     
-    //import cardinality info
-    list<cardinalityRole> carRoleList = importCardinalityInfo();
+    Map* relationshipTable = erd.getRelationshipTable();
     
-    //duplicate entity list
-    list<entitySchema>::iterator entityIter;
-    list<entitySchema>::iterator entityBegin = erd->getEntityList().begin();
-    list<entitySchema>::iterator entityEnd = erd->getEntityList().end();
-    for(entityIter = entityBegin;entityIter != entityEnd;entityIter++){
-        newERD->addEntity(*entityIter);
-    }
-    
-    //relationshipSchema to cardinalityRelationship
-    list<relationshipSchema>::iterator relationIter;
-    list<relationshipSchema>::iterator relationBegin = erd->getRelationshipList().begin();
-    list<relationshipSchema>::iterator relationEnd = erd->getRelationshipList().end();
-    
-    list<cardinalityRole>::iterator carIter;
-    
-    for(relationIter = relationBegin;relationIter != relationEnd;relationIter++){
-        cardinalityRelationship* tmpRelation = new cardinalityRelationship((*relationIter).getRelationshipName());
-        
-        //foreach role in the relationship
-        list<roleSchema> roleList = (*relationIter).getRoleList();
-        list<roleSchema>::iterator roleIter;
-        for(roleIter = roleList.begin();roleIter != roleList.end();roleIter++){
-            //foreach role from cardinality info
-            bool update = false;
-            for(carIter = carRoleList.begin();carIter != carRoleList.end();carIter++){
-                if((*carIter).getRoleName() == (*roleIter).getRoleName()){
-                    tmpRelation->addRoleSchema((*carIter));
-                    update = true;
+    //foreach relationship
+    for(relationshipTable->begin();relationshipTable->end();relationshipTable++) {
+        Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
+        Attribute_List* roleListPtr = relationshipPtr->getRoleList();
+        //foreach cardinality
+        for(cardinalityPtr = cardinalityList.begin();cardinalityPtr != cardinalityList.end();cardinalityPtr++){
+            //foreach role in relationship
+            for(roleListPtr->begin();roleListPtr->end();roleListPtr++){
+                Role* rolePtr = (Role*)(roleListPtr->get_attribute_ref_al("Role_name"));
+                if(cardinalityPtr->roleName == rolePtr->getRoleName()){
+                    Attribute_List tmp;
+                    Int intTmp;
+                    
+                    intTmp.set_value(cardinalityPtr->minNum);
+                    tmp.add_attribute_al("Minimum", intTmp);
+                    
+                    intTmp.set_value(cardinalityPtr->maxNum);
+                    tmp.add_attribute_al("Maximum", intTmp);
+                    
+                    rolePtr->add_attribute_al("Cardinality", tmp);
                 }
             }
-            if(!update){
-                cardinalityRole tmpCarRole;
-                tmpCarRole.setRoleName((*roleIter).getRoleName());
-                tmpRelation->addRoleSchema(tmpCarRole);
-            }
         }
-        newERD->addRelationship(*tmpRelation);
     }
-    
-    return newERD;
 }

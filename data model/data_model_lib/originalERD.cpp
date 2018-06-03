@@ -2,265 +2,298 @@
 
 using namespace std;
 
-originalERDSchema::originalERDSchema()
+ERD::ERD(string erdName)
 {
-    erdName = "";
-}
-
-originalERDSchema::originalERDSchema(string erdName)
-{
-    erdName = erdName;
-}
-
-originalERDSchema::~originalERDSchema()
-{
-}
-
-string originalERDSchema::get_ERD_name()
-{
-    return erdName;
-}
-
-list<entitySchema> originalERDSchema::getEntityList()
-{
-    return entityList;
-}
-list<relationshipSchema> originalERDSchema::getRelationshipList()
-{
-    return relationshipList;
-}
-
-void originalERDSchema::addEntity(entitySchema entity)
-{
-    entityList.push_back(entity);
-}
-
-void originalERDSchema::removeEntity(string entityName)
-{
-    list<entitySchema>::iterator entityIter;
+    setERDName(erdName);
     
-    for(entityIter = entityList.begin();entityIter != entityList.end();entityIter++){
-        if((*entityIter).getEntityName() == entityName){
-            entityList.erase(entityIter);
-        }
+    Map mapTmp;
+    add_attribute_al("Entity_table", mapTmp);
+    add_attribute_al("Relationship_table", mapTmp);
+}
+
+ERD::~ERD()
+{
+}
+
+void ERD::setERDName(string erdName)
+{
+    String tmp;
+    tmp.set_value(erdName);
+    
+    universal_data* ptr = get_attribute_ref_al("ERD_name");
+    if(ptr != NULL) {
+        set_attribute_al("ERD_name", tmp);
+    } else {
+        add_attribute_al("ERD_name", tmp);
     }
 }
 
-void originalERDSchema::addRelationship(relationshipSchema relationship)
+string ERD::getERDName()
 {
-    relationshipList.push_back(relationship);
+    universal_data *tmp = get_attribute_ref_al("ERD_name");
+    
+    String* stringTmp = (String*)tmp;
+    
+    return *(stringTmp->getptr());
 }
 
-void originalERDSchema::removeRelationship(string relationshipName)
+Map* ERD::getEntityTable()
 {
-    list<relationshipSchema>::iterator relationIter;
+    return (Map*)(get_attribute_ref_al("Entity_table"));
+}
+
+Map* ERD::getRelationshipTable()
+{
+    return (Map*)(get_attribute_ref_al("Relationship_table"));
+}
+
+void ERD::addEntity(Entity* en)
+{
+    String stringTmp;
+    stringTmp.set_value(en->getEntityName());
+    Map* mapTmp = getEntityTable();
     
-    for(relationIter = relationshipList.begin();relationIter != relationshipList.end();relationIter++){
-        if((*relationIter).getRelationshipName() == relationshipName){
-            relationshipList.erase(relationIter);
-        }
+    mapTmp->insert(stringTmp, en);
+}
+
+void ERD::removeEntity(string entityName)
+{
+    String stringTmp;
+    stringTmp.set_value(entityName);
+    Map* mapTmp = getEntityTable();
+    
+    mapTmp->erase(stringTmp);
+}
+
+void ERD::addRelationship(Relationship* relationship)
+{
+    String stringTmp;
+    stringTmp.set_value(relationship->getRelationshipName());
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->insert(stringTmp, relationship);
+}
+
+void ERD::removeRelationship(string relationshipName)
+{
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->erase(stringTmp);
+}
+
+Entity* ERD::findEntity(string entityName)
+{
+    String stringTmp;
+    stringTmp.set_value(entityName);
+    Map* mapTmp = getEntityTable();
+    
+    mapTmp->find(stringTmp);
+    
+    return (Entity*)(mapTmp);
+}
+
+Relationship* ERD::findRelationship(string relationshipName)
+{
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->find(stringTmp);
+    
+    return (Relationship*)(mapTmp);
+}
+
+Entity::Entity()
+{
+    Attribute_List attributeListTmp;
+    
+    setEntityName("");
+    add_attribute_al("Attribute_list", attributeListTmp);
+}
+
+Entity::Entity(string entityName)
+{
+    Attribute_List attributeListTmp;
+    
+    setEntityName("entityName");
+    add_attribute_al("Attribute_list", attributeListTmp);
+}
+
+Entity::~Entity()
+{
+    
+}
+
+void Entity::setEntityName(string entityName)
+{
+    String tmp;
+    tmp.set_value(entityName);
+    
+    universal_data* ptr = get_attribute_ref_al("Entity_name");
+    if(ptr != NULL) {
+        set_attribute_al("Entity_name", tmp);
+    } else {
+        add_attribute_al("Entity_name", tmp);
     }
 }
 
-entitySchema originalERDSchema::find_Entity(string entityName)
+string Entity::getEntityName()
 {
-    list<entitySchema>::iterator entityIter;
+    return *((String*)(get_attribute_ref_al("Entity_name")))->getptr();
+}
+
+void Entity::addAttribute(string attributeName,string attributeType)
+{
+    String stringTmp;
+    stringTmp.set_value(attributeType);
+    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
     
-    for(entityIter = entityList.begin();entityIter != entityList.end();entityIter++){
-        if((*entityIter).getEntityName() == entityName){
-            return (*entityIter);
-        }
-    }
-    return (*entityIter);
+    tmp->set_attribute_al(attributeName, stringTmp);
 }
 
-relationshipSchema originalERDSchema::find_Relationship(string relationshipName)
+void Entity::addAttribute(Attribute_List tmpAttribute)
 {
-    list<relationshipSchema>::iterator relationIter;
-    
-    for(relationIter = relationshipList.begin();relationIter != relationshipList.end();relationIter++){
-        if((*relationIter).getRelationshipName() == relationshipName){
-            return (*relationIter);
-        }
-    }
-    return (*relationIter);
-}
-
-entitySchema::entitySchema()
-{
-    name = "";
-}
-
-entitySchema::entitySchema(string entityName)
-{
-    name = entityName;
-}
-
-entitySchema::~entitySchema()
-{
-}
-
-void entitySchema::setEntityName(string entityName)
-{
-    name = entityName;
-}
-
-string entitySchema::getEntityName()
-{
-    return name;
-}
-
-void entitySchema::addAttribute(string attributeName,string attributeType)
-{
-    struct attributeSchema tmp;
-    
-    tmp.name = attributeName;
-    tmp.type = attributeType;
-    
-    attributeList.push_back(tmp);
-}
-
-void entitySchema::addAttribute(attributeSchema tmpAttribute)
-{
-    attributeList.push_back(tmpAttribute);
-}
-
-void entitySchema::removeAttribute(string attributeName)
-{
-    list<attributeSchema>::iterator attributeIter;
-    
-    for(attributeIter = attributeList.begin();attributeIter != attributeList.end();attributeIter++){
-        if((*attributeIter).name == attributeName){
-            attributeList.erase(attributeIter);
-        }
+    universal_data tmp = tmpAttribute.get_attribute();
+    for(tmpAttribute.begin();tmpAttribute.end();tmpAttribute++){
+        addAttribute(tmpAttribute.get_attribute_name(), *(((String*)(&tmp))->getptr()));
     }
 }
 
-list<attributeSchema> entitySchema::getAttributeList()
+void Entity::removeAttribute(string attributeName)
 {
-    return attributeList;
+    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    
+    tmp->remove_attribute_al(attributeName);
 }
 
-relationshipSchema::relationshipSchema()
+Attribute_List* Entity::getAttributeList()
 {
-    name = "";
+    return (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
 }
 
-relationshipSchema::relationshipSchema(string relationshipName)
+Relationship::Relationship()
 {
-    name = relationshipName;
+    setRelationshipName("");
+    
+    Attribute_List tmp;
+    
+    add_attribute_al("Role_list", tmp);
 }
 
-relationshipSchema::~relationshipSchema()
+Relationship::Relationship(string relationshipName)
+{
+    setRelationshipName(relationshipName);
+    
+    Attribute_List tmp;
+    
+    add_attribute_al("Role_list", tmp);
+}
+
+Relationship::~Relationship()
 {
     
 }
 
-void relationshipSchema::setRelationshipName(string relationshipName)
+void Relationship::setRelationshipName(string relationshipName)
 {
-    name = relationshipName;
-}
-
-string relationshipSchema::getRelationshipName()
-{
-    return name;
-}
-
-void relationshipSchema::setDegree(int degree)
-{
-    this->degree = degree;
-}
-
-int relationshipSchema::getDegree()
-{
-    return degree;
-}
-
-void relationshipSchema::addRoleSchema(roleSchema role)
-{
-    roleList.push_back(role);
-}
-
-void relationshipSchema::addRoleSchema(string roleName,string entityName)
-{
-    roleSchema tmp;
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
     
-    tmp.setRoleName(roleName);
-    tmp.setEntityName(entityName);
+    universal_data* ptr = get_attribute_ref_al("Relationship_name");
     
-    roleList.push_back(tmp);
-}
-
-void relationshipSchema::removeRole(string roleName)
-{
-    list<roleSchema>::iterator roleIter;
-    
-    for(roleIter = roleList.begin();roleIter != roleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            roleList.erase(roleIter);
-        }
+    if(ptr != NULL) {
+        set_attribute_al("Relationship_name", stringTmp);
+    } else {
+        add_attribute_al("Relationship_name", stringTmp);
     }
 }
 
-list<roleSchema> relationshipSchema::getRoleList()
+string Relationship::getRelationshipName()
 {
-    return roleList;
+    return *(((String*)(get_attribute_ref_al("Relationship_name")))->getptr());
 }
 
-string relationshipSchema::findEntityByRole(string roleName)
+void Relationship::addRole(Role role)
 {
-    list<roleSchema>::iterator roleIter;
+    string roleName = role.getRoleName();
     
-    for(roleIter = roleList.begin();roleIter != roleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            return (*roleIter).getEntityName();
-        }
+    Attribute_List* attPtr = getRoleList();
+    
+    attPtr->add_attribute_al(roleName, role);
+}
+
+void Relationship::addRole(string roleName, string entityName)
+{
+    Attribute_List* attPtr = getRoleList();
+    
+    Role* roleTmp = new Role(roleName);
+    roleTmp->setEntityName(entityName);
+    
+    attPtr->add_attribute_al(roleName, *roleTmp);
+}
+
+void Relationship::removeRole(string roleName)
+{
+    Attribute_List* attPtr = getRoleList();
+    
+    attPtr->remove_attribute_al(roleName);
+}
+
+Attribute_List* Relationship::getRoleList()
+{
+    return (Attribute_List*)(get_attribute_ref_al("Role_list"));
+}
+
+Role::Role()
+{
+    String stringTmp;
+    
+    setRoleName("");
+    add_attribute_al("Entity_name", stringTmp);
+}
+
+Role::Role(string roleName)
+{
+    String stringTmp;
+    
+    setRoleName(roleName);
+    add_attribute_al("Entity_name", stringTmp);
+}
+
+Role::~Role()
+{
+    
+}
+
+void Role::setRoleName(string roleName)
+{
+    String stringTmp;
+    stringTmp.set_value(roleName);
+    
+    universal_data* ptr = get_attribute_ref_al("Role_name");
+    
+    if(ptr != NULL) {
+        set_attribute_al("Role_name", stringTmp);
+    } else {
+        add_attribute_al("Role_name", stringTmp);
     }
+}
+string Role::getRoleName()
+{
+    return *(((String*)(get_attribute_ref_al("Role_name")))->getptr());
+}
+
+void Role::setEntityName(string entityName)
+{
+    String stringTmp;
+    stringTmp.set_value(entityName);
     
-    return "";
+    set_attribute_al("Entity_name", stringTmp);
 }
 
-roleSchema relationshipSchema::findRole(string roleName)
+string Role::getEntityName()
 {
-    list<roleSchema>::iterator roleIter;
-    
-    for(roleIter = roleList.begin();roleIter != roleList.end();roleIter++){
-        if((*roleIter).getRoleName() == roleName){
-            return (*roleIter);
-        }
-    }
-    return (*roleIter);
-}
-
-roleSchema::roleSchema()
-{
-    name = "";
-}
-roleSchema::roleSchema(string roleName)
-{
-    name = roleName;
-}
-roleSchema::~roleSchema()
-{
-    
-}
-
-void roleSchema::setRoleName(string roleName)
-{
-    name = roleName;
-}
-
-string roleSchema::getRoleName()
-{
-    return name;
-}
-
-void roleSchema::setEntityName(string entityName)
-{
-    this->entityName = entityName;
-}
-
-string roleSchema::getEntityName()
-{
-    return entityName;
+    return *(((String*)(get_attribute_ref_al("Entity_name")))->getptr());
 }

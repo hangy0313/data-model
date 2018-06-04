@@ -31,22 +31,29 @@ int main()
     e1->addAttribute("test1", "int");
     Entity* e2 = new Entity("E2");
     e2->addAttribute("test2", "string");
+    Entity* e3 = new Entity("E3");
+    e2->addAttribute("test3", "char");
 //
     Relationship* r1 = new Relationship("R1");
 //
     r1->addRole("role1", "E1");
     r1->addRole("role2", "E2");
+    r1->addRole("role3", "E3");
 
     tmpERD->addEntity(e1);
     tmpERD->addEntity(e2);
+    tmpERD->addEntity(e3);
     tmpERD->addRelationship(r1);
     
 //    tmpERD->dump();
     
     addCardinalityToERD(tmpERD);
 //    dumpCardinalityERD(tmpERD);
-    
+//    
     addNavigationToERD(tmpERD);
+    dumpNavigationERD(tmpERD);
+    
+    transferToBinary(tmpERD);
     dumpNavigationERD(tmpERD);
     
     return 0;

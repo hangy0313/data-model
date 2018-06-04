@@ -293,8 +293,7 @@ void Relationship::dump()
     
     Attribute_List* roleList = getRoleList();
     for(roleList->begin();!roleList->end();(*roleList)++){
-        universal_data tmp = roleList->get_attribute_value_al();
-        Role* role = (Role*)(&tmp);
+        Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
         cout << "Role name : " << role->getRoleName()
              << ", Entity name : " << role->getEntityName() << endl;
     }

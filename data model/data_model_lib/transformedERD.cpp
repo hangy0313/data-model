@@ -1,157 +1,78 @@
-//#include "transformedERD.h"
-//
-//using namespace std;
-//
-//specializeERD::specializeERD() : navigationERD()
-//{
-//}
-//
-//specializeERD::specializeERD(string erdName) : navigationERD(erdName)
-//{
-//}
-//
-//specializeERD::~specializeERD()
-//{
-//}
-//
-//list<specializeEntity> specializeERD::getSpecializeEntityList()
-//{
-//    return specializeEntityList;
-//}
-//
-//list<specializeRelationship> specializeERD::getSpecializeRelationList()
-//{
-//    return specializeRelationList;
-//}
-//
-//void specializeERD::addEntity(specializeEntity entity)
-//{
-//    specializeEntityList.push_back(entity);
-//}
-//
-//void specializeERD::removeEntity(string entityName)
-//{
-//    list<specializeEntity>::iterator iter;
-//    
-//    for(iter = specializeEntityList.begin();iter != specializeEntityList.end();iter++){
-//        if((*iter).getEntityName() == entityName){
-//            specializeEntityList.erase(iter);
-//        }
-//    }
-//}
-//
-//void specializeERD::addRelationship(specializeRelationship relationship)
-//{
-//    specializeRelationList.push_back(relationship);
-//}
-//
-//void specializeERD::removeRelationship(string relationshipName)
-//{
-//    list<specializeRelationship>::iterator iter;
-//    
-//    for(iter = specializeRelationList.begin();iter != specializeRelationList.end();iter++){
-//        if((*iter).getRelationshipName() == relationshipName){
-//            specializeRelationList.erase(iter);
-//        }
-//    }
-//}
-//
-//specializeEntity specializeERD::findEntity(string entityName)
-//{
-//    list<specializeEntity>::iterator iter;
-//    
-//    for(iter = specializeEntityList.begin();iter != specializeEntityList.end();iter++){
-//        if((*iter).getEntityName() == entityName){
-//            return (*iter);
-//        }
-//    }
-//    return (*iter);
-//}
-//
-//specializeRelationship specializeERD::find_Relationship(string relationshipName)
-//{
-//    list<specializeRelationship>::iterator iter;
-//    
-//    for(iter = specializeRelationList.begin();iter != specializeRelationList.end();iter++){
-//        if((*iter).getRelationshipName() == relationshipName){
-//            return (*iter);
-//        }
-//    }
-//    return (*iter);
-//}
-//
-//specializeEntity::specializeEntity() : navigationEntity()
-//{
-//}
-//
-//specializeEntity::specializeEntity(string entityName) : navigationEntity(entityName)
-//{
-//}
-//
-//specializeEntity::~specializeEntity()
-//{
-//}
-//
-//void specializeEntity::addLinkSchema(linkShema link)
-//{
-//    linkShemaList.push_back(link);
-//}
-//
-//void specializeEntity::addLinkSchema(string linkTarget, string type = "true_link")
-//{
-//    struct linkShema tmpLink;
-//    
-//    tmpLink.type = type;
-//    tmpLink.linkTarget = linkTarget;
-//    
-//    linkShemaList.push_back(tmpLink);
-//}
-//
-//void specializeEntity::removeLinkSchema(string linkTarget)
-//{
-//    list<linkShema>::iterator iter;
-//    
-//    for(iter = linkShemaList.begin();iter != linkShemaList.end();iter++){
-//        if((*iter).linkTarget == linkTarget){
-//            linkShemaList.erase(iter);
-//        }
-//    }
-//}
-//
-//specializeRelationship::specializeRelationship() : cardinalityRelationship()
-//{
-//}
-//
-//specializeRelationship::specializeRelationship(string entityName) : cardinalityRelationship(entityName)
-//{
-//}
-//
-//specializeRelationship::~specializeRelationship()
-//{
-//}
-//
-//void specializeRelationship::addLinkSchema(linkShema link)
-//{
-//    linkShemaList.push_back(link);
-//}
-//
-//void specializeRelationship::addLinkSchema(string linkTarget, string type = "true_link")
-//{
-//    struct linkShema tmpLink;
-//    
-//    tmpLink.type = type;
-//    tmpLink.linkTarget = linkTarget;
-//    
-//    linkShemaList.push_back(tmpLink);
-//}
-//
-//void specializeRelationship::removeLinkSchema(string linkTarget)
-//{
-//    list<linkShema>::iterator iter;
-//    
-//    for(iter = linkShemaList.begin();iter != linkShemaList.end();iter++){
-//        if((*iter).linkTarget == linkTarget){
-//            linkShemaList.erase(iter);
-//        }
-//    }
-//}
+#include "transformedERD.h"
+
+using namespace std;
+
+void transferToBinary(ERD* erd)
+{
+    Map* relationshipTable = erd->getRelationshipTable();
+    
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
+        Attribute_List* roleList = relationshipPtr->getRoleList();
+        
+        if(roleList->size() > 2){
+            //transfer Relationship to Entity
+            string relationshipName = relationshipPtr->getRelationshipName();
+            Entity* tmpEnity = new Entity(relationshipName);
+            
+            for(roleList->begin();!roleList->end();(*roleList)++){
+                Role* rolePtr = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
+                string roleName = rolePtr->getRoleName();
+                string entityName = rolePtr->getEntityName();
+                
+                //add attribute to new Entity
+                tmpEnity->addAttribute(entityName, "string");
+                
+                //create a Relationship to replace Role
+                Relationship* tmpRelationship = new Relationship(roleName);
+                
+                //create new Role for the new Relationship
+                Role* newRole1 = new Role(roleName+"_"+entityName);
+                Role* newRole2 = new Role(roleName+"_"+relationshipName);
+                
+                //set new Role entity name
+                newRole1->setEntityName(entityName);
+                newRole2->setEntityName(relationshipName);
+                
+                //set new Role cardinality
+                Attribute_List* attTmp = (Attribute_List*)(rolePtr->get_attribute_ref_al("Cardinality"));
+                
+                newRole1->add_attribute_al("Cardinality", *attTmp);
+                newRole2->add_attribute_al("Cardinality", *attTmp);
+                
+                //set new Role navigation
+                string navigation = *(((String*)(rolePtr->get_attribute_ref_al("Navigation")))->getptr());
+                
+                String toEntity;
+                toEntity.set_value("to_entity");
+                String toRelationship;
+                toRelationship.set_value("to_relationship");
+                String bidirectional;
+                bidirectional.set_value("bidirectional");
+                
+                if(navigation == "to_entity"){
+                    newRole1->add_attribute_al("Navigation", toEntity);
+                    newRole2->add_attribute_al("Navigation", toRelationship);
+                } else if(navigation == "to_relationship"){
+                    newRole1->add_attribute_al("Navigation", toRelationship);
+                    newRole2->add_attribute_al("Navigation", toEntity);
+                } else {
+                    newRole1->add_attribute_al("Navigation", bidirectional);
+                    newRole2->add_attribute_al("Navigation", bidirectional);
+                }
+                
+                //add new Role to new Relationship
+                tmpRelationship->addRole(*newRole1);
+                tmpRelationship->addRole(*newRole2);
+                
+                //add new Relationship to ERD
+                erd->addRelationship(tmpRelationship);
+            }
+            //add new Entity to ERD
+            erd->addEntity(tmpEnity);
+            
+            //remove original Relationship
+            erd->removeRelationship(relationshipName);
+        }
+    }
+}

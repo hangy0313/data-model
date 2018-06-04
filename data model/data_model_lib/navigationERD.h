@@ -8,11 +8,6 @@
 
 using namespace std;
 
-struct navigationSchema{
-    string roleName;
-    string navigation;
-};
-
 /*
  *  import navigation info
  */

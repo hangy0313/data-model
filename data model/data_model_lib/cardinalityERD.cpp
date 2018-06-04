@@ -40,24 +40,20 @@ void addCardinalityToERD(ERD erd)
     //foreach relationship
     for(relationshipTable->begin();relationshipTable->end();relationshipTable++) {
         Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
-        Attribute_List* roleListPtr = relationshipPtr->getRoleList();
         //foreach cardinality
         for(cardinalityPtr = cardinalityList.begin();cardinalityPtr != cardinalityList.end();cardinalityPtr++){
-            //foreach role in relationship
-            for(roleListPtr->begin();roleListPtr->end();roleListPtr++){
-                Role* rolePtr = (Role*)(roleListPtr->get_attribute_ref_al("Role_name"));
-                if(cardinalityPtr->roleName == rolePtr->getRoleName()){
-                    Attribute_List tmp;
-                    Int intTmp;
-                    
-                    intTmp.set_value(cardinalityPtr->minNum);
-                    tmp.add_attribute_al("Minimum", intTmp);
-                    
-                    intTmp.set_value(cardinalityPtr->maxNum);
-                    tmp.add_attribute_al("Maximum", intTmp);
-                    
-                    rolePtr->add_attribute_al("Cardinality", tmp);
-                }
+            Role* rolePtr = relationshipPtr->findRole(cardinalityPtr->roleName);
+            if(rolePtr != NULL) {
+                Attribute_List tmp;
+                Int intTmp;
+
+                intTmp.set_value(cardinalityPtr->minNum);
+                tmp.add_attribute_al("Minimum", intTmp);
+
+                intTmp.set_value(cardinalityPtr->maxNum);
+                tmp.add_attribute_al("Maximum", intTmp);
+                
+                rolePtr->add_attribute_al("Cardinality", tmp);
             }
         }
     }

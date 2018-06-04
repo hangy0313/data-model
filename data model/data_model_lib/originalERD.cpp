@@ -241,6 +241,13 @@ void Relationship::removeRole(string roleName)
     attPtr->remove_attribute_al(roleName);
 }
 
+Role* Relationship::findRole(string roleName)
+{
+    Attribute_List* attPtr = getRoleList();
+    
+    return (Role*)(attPtr->get_attribute_ref_al(roleName));
+}
+
 Attribute_List* Relationship::getRoleList()
 {
     return (Attribute_List*)(get_attribute_ref_al("Role_list"));

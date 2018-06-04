@@ -73,10 +73,10 @@ public:
     void addRole(Role role);
     void addRole(string roleName,string entityName);
     void removeRole(string roleName);
+    Role* findRole(string roleName);
     Attribute_List* getRoleList();
     
-    string findEntityByRole(string roleName);
-    Role findRole(string roleName);
+//    string findEntityByRole(string roleName);
 };
 
 /*

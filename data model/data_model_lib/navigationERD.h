@@ -8,57 +8,24 @@
 
 using namespace std;
 
+struct navigationSchema{
+    string roleName;
+    string navigation;
+};
+
 /*
- *  import cardinality info
+ *  import navigation info
  */
 Attribute_List* importNavigationInfo();
 
 /*
  *  Role add data member : Navigation => "to_entity", "to_relationship", "bidirectional"
  */
-void addNavigationToERD(ERD erd);
+void addNavigationToERD(ERD* erd);
 
-//class navigationERD;
-//class navigationEntity;
-//
-//
-//struct keySchema{
-//    string type;
-//    list<string> attributeList;
-//};
-//
-//class navigationERD : public cardinalityERD
-//{
-//public:
-//    navigationERD();
-//    navigationERD(string erdName);
-//    ~navigationERD();
-//    
-//    list<navigationEntity> getnavigationEntityList();
-//    void addEntity(navigationEntity entity);
-//    void removeEntity(string entityName);
-//    navigationEntity findEntity(string entityName);
-//protected:
-//    list<navigationEntity> navigationEntityList;
-//};
-//
-//class navigationEntity : public entitySchema
-//{
-//public:
-//    navigationEntity();
-//    navigationEntity(string entityName);
-//    ~navigationEntity();
-//
-//    void addKey(keySchema key);
-//    void addPrimaryKey(string keyName);
-//    string getPrimaryKey();
-//    void addMultiKey(list<string> attList);
-//    list<keySchema> getKeyList();
-//protected:
-//    list<keySchema> keyList;
-//};
-//
-//list<keySchema> importNavigationInfo();
-//navigationERD* transferCardinalityToNavigation(cardinalityERD* erd);
-//
+/*
+ *  Dump ERD info after add navigation
+ */
+void dumpNavigationERD(ERD* erd);
+
 #endif

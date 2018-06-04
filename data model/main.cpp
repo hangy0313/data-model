@@ -44,9 +44,10 @@ int main()
 //    tmpERD->dump();
     
     addCardinalityToERD(tmpERD);
-    dumpCardinalityERD(tmpERD);
+//    dumpCardinalityERD(tmpERD);
     
-//    addNavigationToERD(tmpERD);
+    addNavigationToERD(tmpERD);
+    dumpNavigationERD(tmpERD);
     
     return 0;
 }

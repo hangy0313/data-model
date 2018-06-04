@@ -25,6 +25,28 @@ int main()
 //        cout << (*iter).getCardinality().minNum << endl;
 //        cout << (*iter).getCardinality().maxNum << endl;
 //    }
+    ERD* tmpERD = new ERD("test");
+    
+    Entity* e1 = new Entity("E1");
+    e1->addAttribute("test1", "int");
+    Entity* e2 = new Entity("E2");
+    e2->addAttribute("test2", "string");
+//
+    Relationship* r1 = new Relationship("R1");
+//
+    r1->addRole("role1", "E1");
+    r1->addRole("role2", "E2");
+
+    tmpERD->addEntity(e1);
+    tmpERD->addEntity(e2);
+    tmpERD->addRelationship(r1);
+    
+//    tmpERD->dump();
+    
+    addCardinalityToERD(tmpERD);
+    dumpCardinalityERD(tmpERD);
+    
+//    addNavigationToERD(tmpERD);
     
     return 0;
 }

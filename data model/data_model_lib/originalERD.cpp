@@ -83,6 +83,24 @@ void ERD::removeRelationship(string relationshipName)
     mapTmp->erase(stringTmp);
 }
 
+void ERD::dump()
+{
+    cout << "ERD Name : " << getERDName() << endl;
+    cout << "==Entity Table==" << endl;
+    
+    Map* entityTable = getEntityTable();
+    for(entityTable->begin();!entityTable->end();(*entityTable)++){
+        Entity* entity = (Entity*)(entityTable->value());
+        entity->dump();
+    }
+    
+    Map* relationshipTable = getRelationshipTable();
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        Relationship* relationship = (Relationship*)(relationshipTable->value());
+        relationship->dump();
+    }
+}
+
 Entity* ERD::findEntity(string entityName)
 {
     String stringTmp;
@@ -117,7 +135,7 @@ Entity::Entity(string entityName)
 {
     Attribute_List attributeListTmp;
     
-    setEntityName("entityName");
+    setEntityName(entityName);
     add_attribute_al("Attribute_list", attributeListTmp);
 }
 
@@ -150,7 +168,7 @@ void Entity::addAttribute(string attributeName,string attributeType)
     stringTmp.set_value(attributeType);
     Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
     
-    tmp->set_attribute_al(attributeName, stringTmp);
+    tmp->add_attribute_al(attributeName, stringTmp);
 }
 
 void Entity::addAttribute(Attribute_List tmpAttribute)
@@ -171,6 +189,21 @@ void Entity::removeAttribute(string attributeName)
 Attribute_List* Entity::getAttributeList()
 {
     return (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+}
+
+void Entity::dump()
+{
+    cout << "==========" << endl;
+    cout << "Entity Name : " << getEntityName() << endl;
+    
+    Attribute_List* attList = getAttributeList();
+    for(attList->begin();!attList->end();(*attList)++){
+        universal_data name = attList->get_attribute_name_al();
+        universal_data type = attList->get_attribute_value_al();
+        cout << "name : " << *(((String*)(&name))->getptr())
+             << ", type : " << *(((String*)(&type))->getptr()) << endl;
+    }
+    cout << "==========" << endl;
 }
 
 Relationship::Relationship()
@@ -251,6 +284,21 @@ Role* Relationship::findRole(string roleName)
 Attribute_List* Relationship::getRoleList()
 {
     return (Attribute_List*)(get_attribute_ref_al("Role_list"));
+}
+
+void Relationship::dump()
+{
+    cout << "==========" << endl;
+    cout << "Relationship Name : " << getRelationshipName() << endl;
+    
+    Attribute_List* roleList = getRoleList();
+    for(roleList->begin();!roleList->end();(*roleList)++){
+        universal_data tmp = roleList->get_attribute_value_al();
+        Role* role = (Role*)(&tmp);
+        cout << "Role name : " << role->getRoleName()
+             << ", Entity name : " << role->getEntityName() << endl;
+    }
+    cout << "==========" << endl;
 }
 
 Role::Role()

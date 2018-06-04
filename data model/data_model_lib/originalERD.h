@@ -36,6 +36,8 @@ public:
     void removeRelationship(string relationshipName);
     Entity* findEntity(string entityName);
     Relationship* findRelationship(string relationshipName);
+    
+    void dump();
 };
 
 /*
@@ -55,6 +57,8 @@ public:
     void addAttribute(Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
     Attribute_List* getAttributeList();
+    
+    void dump();
 };
 
 /*
@@ -75,6 +79,8 @@ public:
     void removeRole(string roleName);
     Role* findRole(string roleName);
     Attribute_List* getRoleList();
+    
+    void dump();
     
 //    string findEntityByRole(string roleName);
 };

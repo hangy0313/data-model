@@ -10,18 +10,23 @@ using namespace std;
 
 struct cardinalitySchema{
     string roleName;
-    int minNum;
-    int maxNum;
+    string minNum;
+    string maxNum;
 };
 
 /*
  *  import cardinality info
  */
-list<cardinalitySchema> importCardinalityInfo(ERD erd);
+list<cardinalitySchema> importCardinalityInfo();
 
 /*
  *  Role add data member : Cardinality(Minimum, Maximum)
  */
-void addCardinalityToERD();
+void addCardinalityToERD(ERD* erd);
+
+/*
+ *  Dump ERD info after add cardinality
+ */
+void dumpCardinalityERD(ERD* erd);
 
 #endif

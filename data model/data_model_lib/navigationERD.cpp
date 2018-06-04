@@ -1,132 +1,60 @@
-//#include "navigationERD.h"
-//
-//using namespace std;
-//
-//navigationERD::navigationERD() : cardinalityERD()
-//{
-//}
-//
-//navigationERD::navigationERD(string erdName): cardinalityERD(erdName)
-//{
-//}
-//
-//navigationERD::~navigationERD()
-//{
-//}
-//
-//list<navigationEntity> navigationERD::getnavigationEntityList()
-//{
-//    return navigationEntityList;
-//}
-//
-//void navigationERD::addEntity(navigationEntity entity)
-//{
-//    navigationEntityList.push_back(entity);
-//}
-//
-//void navigationERD::removeEntity(string entityName)
-//{
-//    list<navigationEntity>::iterator iter;
-//    
-//    for(iter = navigationEntityList.begin();iter != navigationEntityList.end();iter++){
-//        if((*iter).getEntityName() == entityName){
-//            navigationEntityList.erase(iter);
-//        }
-//    }
-//}
-//navigationEntity navigationERD::findEntity(string entityName)
-//{
-//    list<navigationEntity>::iterator iter;
-//    
-//    for(iter = navigationEntityList.begin();iter != navigationEntityList.end();iter++){
-//        if((*iter).getEntityName() == entityName){
-//            return (*iter);
-//        }
-//    }
-//    return (*iter);
-//}
-//
-//navigationEntity::navigationEntity() : entitySchema()
-//{
-//}
-//
-//navigationEntity::navigationEntity(string entityName) : entitySchema(entityName)
-//{
-//}
-//
-//navigationEntity::~navigationEntity()
-//{
-//}
-//
-//void navigationEntity::addKey(keySchema key)
-//{
-//    keyList.push_back(key);
-//}
-//
-//void navigationEntity::addPrimaryKey(string keyName)
-//{
-//    struct keySchema tmpKey;
-//    list<keySchema>::iterator iter;
-//    
-//    for(iter = keyList.begin();iter != keyList.end();iter++){
-//        if((*iter).type == "primary_key"){
-//            cout << "primary key is existed" << endl;
-//            return;
-//        }
-//    }
-//    
-//    tmpKey.type = "primary_key";
-//    tmpKey.attributeList.push_back(keyName);
-//    
-//    keyList.push_back(tmpKey);
-//}
-//
-//string navigationEntity::getPrimaryKey()
-//{
-//    list<keySchema>::iterator iter;
-//    
-//    for(iter = keyList.begin();iter != keyList.end();iter++){
-//        if((*iter).type == "primary_key"){
-//            return (*(*iter).attributeList.begin());
-//        }
-//    }
-//    
-//    cout << "There is no primary key" << endl;
-//    exit(1);
-//}
-//
-//void navigationEntity::addMultiKey(list<string> attList)
-//{
-//    struct keySchema tmpKey;
-//    
-//    tmpKey.type = "multi_key";
-//    tmpKey.attributeList = attList;
-//    
-//    keyList.push_back(tmpKey);
-//}
-//
-//list<keySchema> navigationEntity::getKeyList()
-//{
-//    return keyList;
-//}
-//
-//list<keySchema> importNavigationInfo()
-//{
-//    
-//}
-//
-//navigationERD* transferCardinalityToNavigation(cardinalityERD* erd)
-//{
-//    navigationERD* newERD = new navigationERD(erd->get_ERD_name());
-//    
-//    list<keySchema> keyInfoList;
-//    
-//    //duplicate relationship list
-//    list<cardinalityRelationship>::iterator carRelationIter;
-//    list<cardinalityRelationship>::iterator carRelationBegin = erd->getCardinalityRelationList().begin();
-//    list<cardinalityRelationship>::iterator carRelationEnd = erd->getCardinalityRelationList().end();
-//    
-//    for(carRelationIter = carRelationBegin;carRelationIter != carRelationEnd;carRelationIter++){
-//        newERD->addRelationship(carRelationIter)
-//    }
-//}
+#include "navigationERD.h"
+
+using namespace std;
+
+/*
+ *  import cardinality info
+ */
+Attribute_List* importNavigationInfo()
+{
+    Attribute_List* attTmp = new Attribute_List;
+    
+    String navigationString;
+    string roleName, navigation;
+    
+    ifstream navigationInput("./erdScript/navigation.txt");
+    
+    while(navigationInput >> roleName){
+        navigationInput >> navigation;
+        
+        navigationString.set_value(navigation);
+        
+        attTmp->add_attribute_al(roleName, navigationString);
+    }
+
+    return attTmp;
+}
+
+/*
+ *  Role add data member : Navigation => "to_entity", "to_relationship", "bidirectional"
+ */
+void addNavigationToERD(ERD* erd)
+{
+    Attribute_List* navigationList = importNavigationInfo();
+    Map* relationshipTable = erd->getRelationshipTable();
+    
+    //foreach relationship
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
+        Attribute_List* roleList = relationshipPtr->getRoleList();
+        //foreach role
+        for(roleList->begin();!roleList->end();(*roleList)++){
+            universal_data tmp = roleList->get_attribute_value_al();
+            Role* role = (Role*)(&tmp);
+            
+            String tmpString;
+            
+            role->add_attribute_al("Navigation", tmpString);
+            //foreach navigation
+            for(navigationList->begin();!navigationList->end();(*navigationList)++){
+                universal_data tmpName = navigationList->get_attribute_name_al();
+                if(role->getRoleName() == *((String*)(&tmpName))->getptr()){
+                    universal_data tmpNavigation = navigationList->get_attribute_value_al();
+                    String* navigation = (String*)(&tmpNavigation);
+                    
+                    role->set_attribute_al("Navigation", *navigation);
+                }
+            }
+        }
+    }
+}

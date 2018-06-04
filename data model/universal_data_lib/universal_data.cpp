@@ -1823,8 +1823,8 @@ Attribute_List::Attribute_List(const Attribute_List &al){
 void Attribute_List::add_attribute_al(std::string key, universal_data val){
 	String k ;
 	k.set_value(key) ;
-	map<universal_data, universal_data>::iterator iter ;
-	iter = ((Attribute_List_data*)data_ptr)->attributes.find(k) ;
+    map<universal_data, universal_data>::iterator iter ;
+    iter = ((Attribute_List_data*)data_ptr)->attributes.find(k) ; 
 	if(iter == ((Attribute_List_data*)data_ptr)->attributes.end())
 		((Attribute_List_data*)data_ptr)->attributes.insert(pair<universal_data, universal_data>(k, val) ) ;
 	else
@@ -1867,8 +1867,8 @@ universal_data* Attribute_List::get_attribute_ref_al(std::string key){
 	k.set_value(key) ;
 	map<universal_data, universal_data>::iterator iter ;
 	iter = ((Attribute_List_data*)data_ptr)->attributes.find(k) ;
-	if(iter == ((Attribute_List_data*)data_ptr)->attributes.end()) 
-		return NULL ;
+    if(iter == ((Attribute_List_data*)data_ptr)->attributes.end())
+        return NULL ;
 	else
 		return &(iter->second) ;
 }

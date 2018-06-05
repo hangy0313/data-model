@@ -14,18 +14,19 @@ using namespace std;
 
 int main()
 {
-//    /*
-//     *  test importCardinalityInfo()
-//     */
-//    list<cardinalityRole> tmpRoleList = importCardinalityInfo();
-//    list<cardinalityRole>::iterator iter;
-//    
-//    for(iter = tmpRoleList.begin();iter != tmpRoleList.end();iter++){
-//        cout << (*iter).getRoleName() << endl;
-//        cout << (*iter).getCardinality().minNum << endl;
-//        cout << (*iter).getCardinality().maxNum << endl;
-//    }
+    //    /*
+    //     *  test importCardinalityInfo()
+    //     */
+    //    list<cardinalityRole> tmpRoleList = importCardinalityInfo();
+    //    list<cardinalityRole>::iterator iter;
+    //
+    //    for(iter = tmpRoleList.begin();iter != tmpRoleList.end();iter++){
+    //        cout << (*iter).getRoleName() << endl;
+    //        cout << (*iter).getCardinality().minNum << endl;
+    //        cout << (*iter).getCardinality().maxNum << endl;
+    //    }
     ERD* tmpERD = new ERD("test");
+    Map *record = new Map();
     
     Entity* e1 = new Entity("E1");
     e1->addAttribute("test1", "int");
@@ -33,13 +34,13 @@ int main()
     e2->addAttribute("test2", "string");
     Entity* e3 = new Entity("E3");
     e2->addAttribute("test3", "char");
-//
+    //
     Relationship* r1 = new Relationship("R1");
-//
+    //
     r1->addRole("role1", "E1");
     r1->addRole("role2", "E2");
     r1->addRole("role3", "E3");
-
+    
     tmpERD->addEntity(e1);
     tmpERD->addEntity(e2);
     tmpERD->addEntity(e3);
@@ -49,12 +50,18 @@ int main()
     
     addCardinalityToERD(tmpERD);
 //    dumpCardinalityERD(tmpERD);
-//    
+
     addNavigationToERD(tmpERD);
+//    dumpNavigationERD(tmpERD);
+    
+    record = transferToBinary(tmpERD);
     dumpNavigationERD(tmpERD);
     
-    transferToBinary(tmpERD);
-    dumpNavigationERD(tmpERD);
+    cout << endl << "===============" << endl;
+    for(record->begin();!record->end();(*record)++){
+        RelationshipRecord* tmpRecord = (RelationshipRecord*)(record->value());
+        tmpRecord->dump();
+    }
     
     return 0;
 }

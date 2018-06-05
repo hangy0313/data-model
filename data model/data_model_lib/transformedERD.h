@@ -7,7 +7,33 @@
 
 using namespace std;
 
-void transferToBinary(ERD* erd);
+class RelationshipRecord ;
+
+/*
+ *  data member : Relationship, Transformed Entity set and Relationship set
+ */
+class RelationshipRecord : public Attribute_List
+{
+public:
+    RelationshipRecord(string name);
+    ~RelationshipRecord();
+    
+    void setName(string name);
+    string getName();
+    
+    void setSourceRelationship(Relationship* relationship);
+    Relationship* getSourceRelationship();
+    
+    void addTransformedEntity(Entity* entiyty);
+    void addTransformedRelationship(Relationship* relationship);
+    
+    Map* getTransformedEntitySet();
+    Map* getTransformedRelationshipSet();
+    
+    void dump();
+};
+
+Map* transferToBinary(ERD* erd);
 
 
 #endif

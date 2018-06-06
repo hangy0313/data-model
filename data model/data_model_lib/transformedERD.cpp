@@ -127,6 +127,212 @@ void RelationshipRecord::dump()
     }
 }
 
+TransformedERD::TransformedERD(string erdName)
+{
+    setERDName(erdName);
+    
+    Map mapTmp;
+    add_attribute_al("Entity_table", mapTmp);
+    add_attribute_al("Relationship_table", mapTmp);
+}
+
+TransformedERD::~TransformedERD()
+{
+}
+
+void TransformedERD::setERDName(string erdName)
+{
+    String tmp;
+    tmp.set_value(erdName);
+    
+    universal_data* ptr = get_attribute_ref_al("ERD_name");
+    if(ptr != NULL) {
+        set_attribute_al("ERD_name", tmp);
+    } else {
+        add_attribute_al("ERD_name", tmp);
+    }
+}
+
+string TransformedERD::getERDName()
+{
+    universal_data *tmp = get_attribute_ref_al("ERD_name");
+    
+    String* stringTmp = (String*)tmp;
+    
+    return *(stringTmp->getptr());
+}
+
+Map* TransformedERD::getEntityTable()
+{
+    return (Map*)(get_attribute_ref_al("Entity_table"));
+}
+
+Map* TransformedERD::getRelationshipTable()
+{
+    return (Map*)(get_attribute_ref_al("Relationship_table"));
+}
+
+void TransformedERD::addEntity(TransformedEntity* en)
+{
+    String stringTmp;
+    stringTmp.set_value(en->getEntityName());
+    Map* mapTmp = getEntityTable();
+    
+    mapTmp->insert(stringTmp, en);
+}
+
+void TransformedERD::removeEntity(string entityName)
+{
+    String stringTmp;
+    stringTmp.set_value(entityName);
+    Map* mapTmp = getEntityTable();
+    
+    mapTmp->erase(stringTmp);
+}
+
+void TransformedERD::addRelationship(TransformedRelationship* relationship)
+{
+    String stringTmp;
+    stringTmp.set_value(relationship->getRelationshipName());
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->insert(stringTmp, relationship);
+}
+
+void TransformedERD::removeRelationship(string relationshipName)
+{
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->erase(stringTmp);
+}
+
+
+TransformedEntity* TransformedERD::findEntity(string entityName)
+{
+    String stringTmp;
+    stringTmp.set_value(entityName);
+    Map* mapTmp = getEntityTable();
+    
+    mapTmp->find(stringTmp);
+    
+    return (TransformedEntity*)(mapTmp);
+}
+
+TransformedRelationship* TransformedERD::findRelationship(string relationshipName)
+{
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
+    Map* mapTmp = getRelationshipTable();
+    
+    mapTmp->find(stringTmp);
+    
+    return (TransformedRelationship*)(mapTmp);
+}
+
+void TransformedERD::dump()
+{
+    cout << "Transformed ERD Name : " << getERDName() << endl;
+    cout << "==Entity Table==" << endl;
+    
+    Map* entityTable = getEntityTable();
+    for(entityTable->begin();!entityTable->end();(*entityTable)++){
+        TransformedEntity* entity = (TransformedEntity*)(entityTable->value());
+        entity->dump();
+    }
+    
+    Map* relationshipTable = getRelationshipTable();
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        TransformedRelationship* relationship = (TransformedRelationship*)(relationshipTable->value());
+        relationship->dump();
+    }
+}
+
+TransformedEntity::TransformedEntity()
+{
+    Attribute_List attributeListTmp;
+    
+    setEntityName("");
+    add_attribute_al("Attribute_list", attributeListTmp);
+}
+
+TransformedEntity::TransformedEntity(string entityName)
+{
+    Attribute_List attributeListTmp;
+    
+    setEntityName(entityName);
+    add_attribute_al("Attribute_list", attributeListTmp);
+    add_attribute_al("Link_set", attributeListTmp);
+}
+
+TransformedEntity::~TransformedEntity()
+{
+    
+}
+
+void TransformedEntity::setEntityName(string entityName)
+{
+    String tmp;
+    tmp.set_value(entityName);
+    
+    universal_data* ptr = get_attribute_ref_al("Entity_name");
+    if(ptr != NULL) {
+        set_attribute_al("Entity_name", tmp);
+    } else {
+        add_attribute_al("Entity_name", tmp);
+    }
+}
+
+string TransformedEntity::getEntityName()
+{
+    return *((String*)(get_attribute_ref_al("Entity_name")))->getptr();
+}
+
+void TransformedEntity::addAttribute(string attributeName,string attributeType)
+{
+    String stringTmp;
+    stringTmp.set_value(attributeType);
+    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    
+    tmp->add_attribute_al(attributeName, stringTmp);
+}
+
+void TransformedEntity::addAttribute(Attribute_List tmpAttribute)
+{
+    universal_data tmp = tmpAttribute.get_attribute();
+    for(tmpAttribute.begin();tmpAttribute.end();tmpAttribute++){
+        addAttribute(tmpAttribute.get_attribute_name(), *(((String*)(&tmp))->getptr()));
+    }
+}
+
+void TransformedEntity::removeAttribute(string attributeName)
+{
+    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    
+    tmp->remove_attribute_al(attributeName);
+}
+
+Attribute_List* TransformedEntity::getAttributeList()
+{
+    return (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+}
+
+void TransformedEntity::dump()
+{
+    cout << "==========" << endl;
+    cout << "Entity Name : " << getEntityName() << endl;
+    
+    Attribute_List* attList = getAttributeList();
+    for(attList->begin();!attList->end();(*attList)++){
+        universal_data name = attList->get_attribute_name_al();
+        universal_data type = attList->get_attribute_value_al();
+        cout << "name : " << *(((String*)(&name))->getptr())
+        << ", type : " << *(((String*)(&type))->getptr()) << endl;
+    }
+    cout << "==========" << endl;
+}
+
 Map* transferToBinary(ERD* erd)
 {
     Map* relationshipTable = erd->getRelationshipTable();

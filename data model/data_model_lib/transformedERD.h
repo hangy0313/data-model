@@ -4,6 +4,7 @@
 #include "../universal_data_lib/universal_data_lib.h"
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -128,5 +129,7 @@ public:
 };
 
 Map* transferToBinary(ERD* erd);
+Map* importDirectionDegeneration();
+void directionDegeneration(ERD* erd);
 
 #endif

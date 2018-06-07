@@ -522,7 +522,7 @@ Map* transferToBinary(ERD* erd)
                 
                 //create new Role for the new Relationship
                 Role* newRole1 = new Role("ROLE_"+entityName);
-                Role* newRole2 = new Role("ROLE_"+tmpEnity->getEntityName());
+                Role* newRole2 = new Role("ROLE_"+roleName);
                 
                 //set new Role entity name
                 newRole1->setEntityName(entityName);
@@ -580,4 +580,99 @@ Map* transferToBinary(ERD* erd)
     }
     
     return record;
+}
+
+Map* importDirectionDegeneration()
+{
+    ifstream dirDegenerationInput("./decision/direction_degeneration.txt");
+    Map* mapTmp = new Map();
+    
+    string roleName, to_entity, to_relationship, directionName;
+    
+    while(dirDegenerationInput >> roleName){
+        Attribute_List* attTmp = new Attribute_List();
+        String stringTmp;
+        
+        dirDegenerationInput >> directionName;
+        dirDegenerationInput >> to_entity;
+        stringTmp.set_value(to_entity);
+        attTmp->add_attribute_al(directionName, stringTmp);
+        
+        dirDegenerationInput >> directionName;
+        dirDegenerationInput >> to_relationship;
+        stringTmp.set_value(to_relationship);
+        attTmp->add_attribute_al(directionName, stringTmp);
+
+        stringTmp.set_value(roleName);
+        mapTmp->insert(stringTmp, attTmp);
+    }
+//    cout << mapTmp->size();
+//    for(mapTmp->begin();!mapTmp->end();(*mapTmp)++){
+//        Attribute_List* attTmp = (Attribute_List*)(mapTmp->value());
+//        string toEntity = *(((String*)(attTmp->get_attribute_ref_al("to_entity")))->getptr());
+//        string toRelationship = *(((String*)(attTmp->get_attribute_ref_al("to_relationship")))->getptr());
+//      universal_data tmp = mapTmp->key();
+//        cout << *(((String*)(&tmp))->getptr()) << endl;
+//        cout << toEntity << " " << toRelationship << endl;
+//    }
+    
+    return mapTmp;
+}
+
+void directionDegeneration(ERD* erd)
+{
+    Map* dirDegeneration = importDirectionDegeneration();
+    Map* relationshipTable = (Map*)(erd->get_attribute_ref_al("Relationship_table"));
+    
+    //foreach direction degeneration
+    for(dirDegeneration->begin();!dirDegeneration->end();(*dirDegeneration)++){
+        universal_data tmp = dirDegeneration->key();
+        string roleName = *(((String*)(&tmp))->getptr());
+        Attribute_List* attTmp = (Attribute_List*)(dirDegeneration->value());
+        //foreach relationship
+        for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+            Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
+            Attribute_List* roleList = relationshipPtr->getRoleList();
+            for(roleList->begin();!roleList->end();(*roleList)++){
+                Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
+                if(roleName == role->getRoleName()){
+                    String* navigationPtr = (String*)(role->get_attribute_ref_al("Navigation"));
+                    string navigation = *(navigationPtr->getptr());
+                    String stringTmp;
+                    
+                    string toEntity = *(((String*)(attTmp->get_attribute_ref_al("to_entity")))->getptr());
+                    string toRelationship = *(((String*)(attTmp->get_attribute_ref_al("to_relationship")))->getptr());
+                    
+                    if(navigation == "to_entity"){
+                        if(toEntity == "1"){
+                            stringTmp.set_value("NULL");
+                            role->set_attribute_al("Navigation", stringTmp);
+                        }
+                    }else if(navigation == "to_relationship"){
+                        if(toRelationship == "1"){
+                            stringTmp.set_value("NULL");
+                            role->set_attribute_al("Navigation", stringTmp);
+                        }
+                    }else{ //bidirectional
+                        if(toEntity == "1"){
+                            if(toRelationship == "1"){
+                                stringTmp.set_value("NULL");
+                                role->set_attribute_al("Navigation", stringTmp);
+                            }
+                            if(toRelationship == "0"){
+                                stringTmp.set_value("to_relationship");
+                                role->set_attribute_al("Navigation", stringTmp);
+                            }
+                        }
+                        if(toEntity == "0"){
+                            if(toRelationship == "1"){
+                                stringTmp.set_value("to_entity");
+                                role->set_attribute_al("Navigation", stringTmp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

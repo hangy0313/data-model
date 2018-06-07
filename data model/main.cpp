@@ -57,11 +57,15 @@ int main()
     record = transferToBinary(tmpERD);
     dumpNavigationERD(tmpERD);
     
-    cout << endl << "===============" << endl;
-    for(record->begin();!record->end();(*record)++){
-        RelationshipRecord* tmpRecord = (RelationshipRecord*)(record->value());
-        tmpRecord->dump();
-    }
+    //print record table which record mapping of n-ary relationship and binary relationship
+//    cout << endl << "===============" << endl;
+//    for(record->begin();!record->end();(*record)++){
+//        RelationshipRecord* tmpRecord = (RelationshipRecord*)(record->value());
+//        tmpRecord->dump();
+//    }
+    
+    directionDegeneration(tmpERD);
+    dumpNavigationERD(tmpERD);
     
     return 0;
 }

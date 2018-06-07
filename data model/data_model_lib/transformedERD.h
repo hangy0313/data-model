@@ -11,6 +11,7 @@ class RelationshipRecord;
 class TransformedERD;
 class TransformedEntity;
 class TransformedRelationship;
+class Link;
 
 /*
  *  data member : Relationship, Transformed Entity set and Relationship set
@@ -76,6 +77,8 @@ public:
     void addAttribute(Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
     Attribute_List* getAttributeList();
+    void addLink(Link linkName);
+    void removeLink(Link linkName);
     
     void dump();
 };
@@ -92,17 +95,36 @@ public:
     
     void setRelationshipName(string relationshipName);
     string getRelationshipName();
+    void addLink(Link linkName);
+    void removeLink(Link linkName);
     
     void dump();
 };
 
 /*
- *  member data : link tag(to entity or to relationship)
- *                target name, symbolic link, true link
+ *  member data : link name, link type, 
+ *                link direction(to entity or to relationship),
+ *                target name,
+ *                symbolic link,
+ *                true link
  */
 class Link : public Attribute_List
 {
+public:
+public:
+    Link();
+    ~Link();
     
+    void setName(string name);
+    string getName();
+    void setType(string type);
+    string getType();
+    void setDirection(string direction);
+    string getDirection();
+    void setTargetName(string name);
+    string getTargetName();
+    void setTrueLink(universal_data utmp);
+    universal_data* getTrueLink();
 };
 
 Map* transferToBinary(ERD* erd);

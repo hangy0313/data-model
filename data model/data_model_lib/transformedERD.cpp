@@ -318,6 +318,20 @@ Attribute_List* TransformedEntity::getAttributeList()
     return (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
 }
 
+void TransformedEntity::addLink(Link linkName)
+{
+    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    
+    linkSet->add_attribute_al(linkName.getName(), linkName);
+}
+
+void TransformedEntity::removeLink(Link linkName)
+{
+    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    
+    linkSet->remove_attribute_al(linkName);
+}
+
 void TransformedEntity::dump()
 {
     cout << "==========" << endl;
@@ -333,6 +347,146 @@ void TransformedEntity::dump()
     cout << "==========" << endl;
 }
 
+TransformedRelationship::TransformedRelationship(string relationshipName)
+{
+    Attribute_List attributeListTmp;
+    
+    setRelationshipName(relationshipName);
+    add_attribute_al("Link_set", attributeListTmp);
+}
+
+TransformedRelationship::~TransformedRelationship()
+{
+    
+}
+
+void TransformedRelationship::setRelationshipName(string relationshipName)
+{
+    String stringTmp;
+    stringTmp.set_value(relationshipName);
+    
+    universal_data* ptr = get_attribute_ref_al("Relationship_name");
+    
+    if(ptr != NULL) {
+        set_attribute_al("Relationship_name", stringTmp);
+    } else {
+        add_attribute_al("Relationship_name", stringTmp);
+    }
+}
+
+string TransformedRelationship::getRelationshipName()
+{
+    return *(((String*)(get_attribute_ref_al("Relationship_name")))->getptr());
+}
+
+void TransformedRelationship::addLink(Link linkName)
+{
+    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    
+    linkSet->add_attribute_al(linkName.getName(), linkName);
+}
+
+void TransformedRelationship::removeLink(Link linkName)
+{
+     Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    
+    linkSet->remove_attribute_al(linkName);
+}
+
+void TransformedRelationship::dump()
+{
+    
+}
+
+Link::Link(){
+    String stringTmp;
+    
+    stringTmp.set_value("");
+    add_attribute_al("Name", stringTmp);
+    
+    stringTmp.set_value("True_link");
+    add_attribute_al("Type", stringTmp);
+    
+    stringTmp.set_value("");
+    add_attribute_al("Direction", stringTmp);
+    
+    stringTmp.set_value("");
+    add_attribute_al("Taget_name", stringTmp);
+    
+    Map mapTmp;
+    add_attribute_al("Symbolic_link", mapTmp);
+    
+    universal_data tmp;
+    add_attribute_al("True_link", tmp);
+}
+
+Link::~Link()
+{
+    
+}
+
+void Link::setName(string name)
+{
+    String tmp;
+    
+    tmp.set_value(name);
+    set_attribute_al("Name", tmp);
+}
+
+string Link::getName()
+{
+    return *(((String*)get_attribute_ref_al("Name"))->getptr());
+}
+
+void Link::setType(string type)
+{
+    String tmp;
+    
+    tmp.set_value(type);
+    set_attribute_al("Type", tmp);
+}
+
+string Link::getType()
+{
+    return *(((String*)get_attribute_ref_al("Type"))->getptr());
+}
+
+void Link::setDirection(string direction)
+{
+    String tmp;
+    
+    tmp.set_value(direction);
+    set_attribute_al("Direction", tmp);
+}
+
+string Link::getDirection()
+{
+    return *(((String*)get_attribute_ref_al("Direction"))->getptr());
+}
+
+void Link::setTargetName(string name)
+{
+    String tmp;
+    
+    tmp.set_value(name);
+    set_attribute_al("Taget_name", tmp);
+}
+
+string Link::getTargetName()
+{
+    return *(((String*)get_attribute_ref_al("Taget_name"))->getptr());
+}
+
+void Link::setTrueLink(universal_data utmp)
+{
+    set_attribute_al("True_link", utmp);
+}
+
+universal_data* Link::getTrueLink()
+{
+    return get_attribute_ref_al("True_link");
+}
+
 Map* transferToBinary(ERD* erd)
 {
     Map* relationshipTable = erd->getRelationshipTable();
@@ -346,7 +500,7 @@ Map* transferToBinary(ERD* erd)
             String tmpStrnig;
             //transfer Relationship to Entity
             string relationshipName = relationshipPtr->getRelationshipName();
-            Entity* tmpEnity = new Entity(relationshipName);
+            Entity* tmpEnity = new Entity("ENTITY_"+relationshipName);
             
             //relationshipRecord for record relationship and entity info before flat
             RelationshipRecord* tmpRecord = new RelationshipRecord(relationshipName);
@@ -364,15 +518,15 @@ Map* transferToBinary(ERD* erd)
                 tmpEnity->addAttribute(entityName, "string");
                 
                 //create a Relationship to replace Role
-                Relationship* tmpRelationship = new Relationship(roleName);
+                Relationship* tmpRelationship = new Relationship("RELATIONSHIP_"+roleName);
                 
                 //create new Role for the new Relationship
-                Role* newRole1 = new Role(roleName+"_"+entityName);
-                Role* newRole2 = new Role(roleName+"_"+relationshipName);
+                Role* newRole1 = new Role("ROLE_"+entityName);
+                Role* newRole2 = new Role("ROLE_"+tmpEnity->getEntityName());
                 
                 //set new Role entity name
                 newRole1->setEntityName(entityName);
-                newRole2->setEntityName(relationshipName);
+                newRole2->setEntityName(tmpEnity->getEntityName());
                 
                 //set new Role cardinality
                 Attribute_List* attTmp = (Attribute_List*)(rolePtr->get_attribute_ref_al("Cardinality"));

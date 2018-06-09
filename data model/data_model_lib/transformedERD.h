@@ -78,8 +78,13 @@ public:
     void addAttribute(Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
     Attribute_List* getAttributeList();
+    
     void addLink(Link linkName);
     void removeLink(Link linkName);
+    void addListLink(Link* linkName);
+    void addHeadLink(Link linkName);
+    void addNextLink(Link linkName);
+
     
     void dump();
 };
@@ -96,8 +101,12 @@ public:
     
     void setRelationshipName(string relationshipName);
     string getRelationshipName();
+    
     void addLink(Link linkName);
     void removeLink(Link linkName);
+    void addListLink(Link* linkName);
+    void addHeadLink(Link linkName);
+    void addNextLink(Link linkName);
     
     void dump();
 };
@@ -129,7 +138,12 @@ public:
 };
 
 Map* transferToBinary(ERD* erd);
+
 Map* importDirectionDegeneration();
 void directionDegeneration(ERD* erd);
+
+Map* importEmbedding();
+void duplicate(ERD* erd, TransformedERD* transERD);
+void embedding(ERD* erd, TransformedERD* transERD);
 
 #endif

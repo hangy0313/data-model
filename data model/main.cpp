@@ -26,6 +26,7 @@ int main()
     //        cout << (*iter).getCardinality().maxNum << endl;
     //    }
     ERD* tmpERD = new ERD("test");
+    TransformedERD* trnasERD = new TransformedERD(tmpERD->getERDName());
     Map *record = new Map();
     
     Entity* e1 = new Entity("E1");

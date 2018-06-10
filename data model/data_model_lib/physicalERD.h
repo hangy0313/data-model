@@ -5,6 +5,8 @@
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
 
+void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap);
+
 struct dataMemberSchema
 {
     string accessSpecifier;
@@ -16,14 +18,14 @@ struct memberFunctionSchema
 {
     string returnType;
     string functionName;
-    list<pair<string, string>> parameters;
+    list<pair<string, string> > parameters;
     node* functionBody;
 };
 
-class physicalERD
+class physicalERD : public universal_data
 {
 public:
-    physicalERD();
+    physicalERD(string name);
     ~physicalERD();
     
     void setClassName(string name);
@@ -34,9 +36,9 @@ public:
     list<dataMemberSchema> getAllDataMember();
 
     //for specific function
-    void addMemberFunction(string rType, string functionName, list<pair<string, string>> plist, node* content);
+    void addMemberFunction(string rType, string functionName, list<pair<string, string> > plist, node* content);
     //for basic function
-    void addMemberFunction(string prefix, string rtype, string suffix, list<pair<string, string>> plist);
+    void addMemberFunction(string prefix, string rtype, string suffix, list<pair<string, string> > plist);
     void removeMemberFunction(string functionName);
     list<memberFunctionSchema> getAllMemberFunction();
 protected:

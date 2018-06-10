@@ -12,6 +12,59 @@
 
 using namespace std;
 
+void show_universal_data(universal_data ud)
+{
+    if(ud.get_type_tag() == T_int)
+        cout<< *(((Int*)(&ud))->getptr()) ;
+    else if (ud.get_type_tag() == T_char)
+        cout<< *(((Char*)(&ud))->getptr()) ;
+    else if (ud.get_type_tag() == T_string)
+        cout<< *(((String*)(&ud))->getptr()) ;
+    else if (ud.get_type_tag() == T_float)
+        cout<< *(((Float*)(&ud))->getptr()) ;
+    else if (ud.get_type_tag() == T_double)
+        cout<< *(((Double*)(&ud))->getptr()) ;
+    else 
+        cout<<"unknown" ;
+}
+
+void print_parse_tree_mini(node* nodeptr)
+{
+    if( nodeptr == NULL)
+    {
+        cout<<"node:: empty subrule"<<endl ;
+        return ;
+    }
+    cout<<"node construct_name: "<< nodeptr->get_construct_name()<<endl ;
+    cout<<"attribute: "<<endl ;
+    Associate_List_Iterator* aiter = (Associate_List_Iterator*)(nodeptr->get_node_attribute_iter()) ;
+    for(aiter->begin() ; !aiter->end(); aiter->advance())
+    {
+        if(aiter->first() != "NoName")
+        {
+            cout<<"attr: "<<aiter->first()<<endl ;
+            cout<<"value: "; show_universal_data(aiter->second()) ;
+            cout<<endl ;
+        }
+    }
+    cout<<endl ;
+    
+    cout<<"binding: "<<endl ;
+    for(nodeptr->binding_info_begin() ; !nodeptr->binding_info_end() ; nodeptr->binding_info_advance())
+        cout<<"kind: "<<nodeptr->binding_info_kind()<<"name: "<<nodeptr->binding_info_name()<<endl ;
+    
+    cout<<"child: {// "<<endl ;
+    
+    Virtual_Iterator* biter = nodeptr->get_node_branch_iter() ;
+    for(biter->begin() ; !biter->end() ; biter->advance())
+    {
+        node* tmp = (node*)(*(*biter)) ;
+        print_parse_tree_mini( tmp ) ;
+    }
+    
+    cout<<" //}"<<endl ;
+}
+
 int main()
 {
     //    /*
@@ -27,7 +80,8 @@ int main()
     //    }
     ERD* tmpERD = new ERD("test");
     TransformedERD* trnasERD = new TransformedERD(tmpERD->getERDName());
-    Map *record = new Map();
+    Map* record = new Map();
+    Map* physicalERDMap = new Map();
     
     Entity* e1 = new Entity("E1");
     e1->addAttribute("test1", "int");
@@ -70,6 +124,34 @@ int main()
     
     embedding(tmpERD, trnasERD);
     trnasERD->dump();
+    
+//    string test = "Head_Link_E2_RELATIONSHIP_role2";
+//    int pos = test.find("Head_");
+//    cout << pos << endl;
+    tansToPhysicalModel(trnasERD, physicalERDMap);
+    
+    for(physicalERDMap->begin();!physicalERDMap->end();(*physicalERDMap)++){
+        physicalERD* classPtr = (physicalERD*)(physicalERDMap->value());
+        
+        list<memberFunctionSchema> functionList = classPtr->getAllMemberFunction();
+        list<memberFunctionSchema>::iterator functionPtr;
+        for(functionPtr = functionList.begin();functionPtr != functionList.end();functionPtr++){
+            node* functionBody = (*functionPtr).functionBody;
+            string returnType = (*functionPtr).returnType;
+            string functionName = (*functionPtr).functionName;
+            list<pair<string, string> > parameters = (*functionPtr).parameters;
+            list<pair<string, string> >::iterator paramPtr;
+            
+//            member_function_info mfi = mfs_iter->second ;
+            cout << "==>" << returnType << " "<< functionName << " (";
+//            list<pair<string, string> >::iterator piter ;
+            for(paramPtr = parameters.begin();paramPtr != parameters.end();paramPtr++)
+                cout << (*paramPtr).first << " " << (*paramPtr).second << " ,";
+            cout << ") {" << endl;
+            print_parse_tree_mini(functionBody);
+            cout << "    }"<<endl;
+        }
+    }
     
     return 0;
 }

@@ -7,7 +7,7 @@
 #include "transformedERD.h"
 //#include "segmentationERD.h"
 //#include "logicalERD.h"
-//#include "physicalERD.h"
+#include "physicalERD.h"
 
 #include "originalERD.cpp"
 #include "cardinalityERD.cpp"
@@ -15,6 +15,6 @@
 #include "transformedERD.cpp"
 //#include "segmentationERD.cpp"
 //#include "logicalERD.cpp"
-//#include "physicalERD.cpp"
+#include "physicalERD.cpp"
 
 #endif

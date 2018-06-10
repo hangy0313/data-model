@@ -34,7 +34,7 @@ int main()
     Entity* e2 = new Entity("E2");
     e2->addAttribute("test2", "string");
     Entity* e3 = new Entity("E3");
-    e2->addAttribute("test3", "char");
+    e3->addAttribute("test3", "char");
     //
     Relationship* r1 = new Relationship("R1");
     //
@@ -56,7 +56,7 @@ int main()
 //    dumpNavigationERD(tmpERD);
     
     record = transferToBinary(tmpERD);
-    dumpNavigationERD(tmpERD);
+//    dumpNavigationERD(tmpERD);
     
     //print record table which record mapping of n-ary relationship and binary relationship
 //    cout << endl << "===============" << endl;
@@ -67,6 +67,9 @@ int main()
     
     directionDegeneration(tmpERD);
     dumpNavigationERD(tmpERD);
+    
+    embedding(tmpERD, trnasERD);
+    trnasERD->dump();
     
     return 0;
 }

@@ -8,6 +8,7 @@
 //#include "segmentationERD.h"
 //#include "logicalERD.h"
 #include "physicalERD.h"
+#include "parseERD.h"
 
 #include "originalERD.cpp"
 #include "cardinalityERD.cpp"
@@ -16,5 +17,6 @@
 //#include "segmentationERD.cpp"
 //#include "logicalERD.cpp"
 #include "physicalERD.cpp"
+#include "parseERD.cpp"
 
 #endif

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include "./data_model_lib/dataModelLib.h"
+#include "./output_generation_lib/output_generation_lib.h"
 
 using namespace std;
 
@@ -130,28 +131,72 @@ int main()
 //    cout << pos << endl;
     tansToPhysicalModel(trnasERD, physicalERDMap);
     
-    for(physicalERDMap->begin();!physicalERDMap->end();(*physicalERDMap)++){
-        physicalERD* classPtr = (physicalERD*)(physicalERDMap->value());
-        
-        list<memberFunctionSchema> functionList = classPtr->getAllMemberFunction();
-        list<memberFunctionSchema>::iterator functionPtr;
-        for(functionPtr = functionList.begin();functionPtr != functionList.end();functionPtr++){
-            node* functionBody = (*functionPtr).functionBody;
-            string returnType = (*functionPtr).returnType;
-            string functionName = (*functionPtr).functionName;
-            list<pair<string, string> > parameters = (*functionPtr).parameters;
-            list<pair<string, string> >::iterator paramPtr;
-            
-//            member_function_info mfi = mfs_iter->second ;
-            cout << "==>" << returnType << " "<< functionName << " (";
-//            list<pair<string, string> >::iterator piter ;
-            for(paramPtr = parameters.begin();paramPtr != parameters.end();paramPtr++)
-                cout << (*paramPtr).first << " " << (*paramPtr).second << " ,";
-            cout << ") {" << endl;
-            print_parse_tree_mini(functionBody);
-            cout << "    }"<<endl;
-        }
+//    for(physicalERDMap->begin();!physicalERDMap->end();(*physicalERDMap)++){
+//        physicalERD* classPtr = (physicalERD*)(physicalERDMap->value());
+//        cout << "------->" << classPtr->getClassName() << endl;
+//        
+//        list<memberFunctionSchema> functionList = classPtr->getAllMemberFunction();
+//        list<memberFunctionSchema>::iterator functionPtr;
+//        for(functionPtr = functionList.begin();functionPtr != functionList.end();functionPtr++){
+//            node* functionBody = (*functionPtr).functionBody;
+//            string returnType = (*functionPtr).returnType;
+//            string functionName = (*functionPtr).functionName;
+//            list<pair<string, string> > parameters = (*functionPtr).parameters;
+//            list<pair<string, string> >::iterator paramPtr;
+//            
+////            member_function_info mfi = mfs_iter->second ;
+//            cout << "==>" << returnType << " "<< functionName << " (";
+////            list<pair<string, string> >::iterator piter ;
+//            for(paramPtr = parameters.begin();paramPtr != parameters.end();paramPtr++)
+//                cout << (*paramPtr).first << " " << (*paramPtr).second << " ,";
+//            cout << ") {" << endl;
+//            print_parse_tree_mini(functionBody);
+//            cout << "    }"<<endl;
+//        }
+//    }
+    
+    node* ptree = transToParseTree(physicalERDMap);
+    
+    general_output_generation gog("data_model_lib/physical_model_cpp_language/node_print_rule_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/global_print_table_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/interleave_vector_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/enclose_vector_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/file_root_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/indent_control_table_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/condition_function_table_file.txt") ;
+    // set precedence
+    initialized_precedence_table("data_model_lib/physical_model_cpp_language/precedence_file.txt") ;
+    // set up node print function
+    string filename = "data_model_lib/physical_model_cpp_language/node_print_function_file.txt" ;
+    ifstream infile(filename.c_str());
+    if(!infile)
+    {
+        cout<<"open file fail "<<filename<<endl;
+        exit(-1) ;
     }
+    
+    string construct_name;
+    string tmp1, tmp2;
+    while(infile>>construct_name )
+    {
+        infile>>tmp1 ;
+        infile>>tmp2 ;
+        if (tmp1 != "default" || tmp2 != "default")
+        {
+            cout<<"different than default"<<endl ;
+            exit(-1) ;
+        }
+        gog.set_node_print_function(construct_name, print_node_info_func, print_node_info_func);
+    }
+    //set condition function
+    gog.set_condition_fptr("less_than", less_than);
+    
+    // invoke output shaping
+    gog.output_generation(ptree);
+    cout<<"output generation	=> finish"<<endl;
+    
+    gog.output_file(true);
+    cout<<"output file finish	=> finish"<<endl;
     
     return 0;
 }

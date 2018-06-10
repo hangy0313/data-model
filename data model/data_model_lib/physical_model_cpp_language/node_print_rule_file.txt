@@ -1,0 +1,38 @@
+C++				string_value "" 
+class_declaration		string_value "class"
+class_definition		string_value "class" 
+class_content			attribute_name	F	class_name 
+data_member_sequence		string_value "" 
+data_member			string_value "" 
+member_function_sequence	string_value "" 
+member_function			string_value "" 
+parameter_list			string_value "" 
+par				string_value "" 
+body				string_value "" 
+macros				string_value "" 
+function_definition		string_value "" 
+function_interface		string_value "" 
+block				string_value "" 
+variable_sequence		string_value "" 
+statement_sequence		string_value "" 
+variable_declaration		string_value "" 
+statement 			string_value "" 
+assignment_statement		attribute_name	F	assign_op 
+branch_statement		string_value "" 
+for_loop			string_value "for" 
+function_call			string_value "" 
+return_process			string_value "return" 
+element				string_value "" 
+expression			string_value "" 
+if_else				string_value "if"
+element_list			string_value "" 
+binary_expression		attribute_name	F	binary_op
+unary_expression		attribute_name	F	unary_op 
+object_call_function		string_value "" 
+object_call_member		string_value "" 
+pointer_call_function		string_value "" 
+pointer_call_member		string_value "" 
+type				attribute_name 	F 	type 
+var				attribute_name	F 	var
+function_name			attribute_name	F	function_name
+value				attribute_name	F	value

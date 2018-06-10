@@ -26,6 +26,7 @@
 		B11D90CD20BF8DD10023EDCA /* data_model_lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data_model_lib; sourceTree = "<group>"; };
 		B11D90CE20BF8DD10023EDCA /* universal_data_lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = universal_data_lib; sourceTree = "<group>"; };
 		B11D90CF20BFF8770023EDCA /* generalized_parser_lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = generalized_parser_lib; sourceTree = "<group>"; };
+		B1424CBF20CDB3D1008FB0F1 /* output_generation_lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = output_generation_lib; sourceTree = "<group>"; };
 		B18441D020BF8CED00B14F3F /* data model */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "data model"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B18441D320BF8CED00B14F3F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,6 +61,7 @@
 		B18441D220BF8CED00B14F3F /* data model */ = {
 			isa = PBXGroup;
 			children = (
+				B1424CBF20CDB3D1008FB0F1 /* output_generation_lib */,
 				B11D90CF20BFF8770023EDCA /* generalized_parser_lib */,
 				B11D90CD20BF8DD10023EDCA /* data_model_lib */,
 				B11D90CE20BF8DD10023EDCA /* universal_data_lib */,

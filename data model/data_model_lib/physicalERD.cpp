@@ -185,7 +185,7 @@ void physicalERD::addMemberFunction(string prefix,
         assignStatement->set_t_nt_flag('n');
         assignStatement->set_construct_name("assignment_statement");
         stmp.set_value("=");
-        assignStatement->set_attribute("assign_op", stmp);
+        assignStatement->add_node_attribute("assign_op", stmp);
         assignStatement->push_node_branch(leftSide);
         leftSide->push_parent_pointer(assignStatement);
         assignStatement->push_node_branch(rightSide);

@@ -154,6 +154,7 @@ int main()
 //            cout << "    }"<<endl;
 //        }
 //    }
+//    macro_definition_input_procedure("print_func", "./result.txt") ;
     
     node* ptree = transToParseTree(physicalERDMap);
     
@@ -196,7 +197,7 @@ int main()
     cout<<"output generation	=> finish"<<endl;
     
     gog.output_file(true);
-    cout<<"output file finish	=> finish"<<endl;
+//    cout<<"output file finish	=> finish"<<endl;
     
     return 0;
 }

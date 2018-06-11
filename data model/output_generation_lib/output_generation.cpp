@@ -722,7 +722,7 @@ void general_output_generation::traverse_inorder(node *nodeptr)
 		stringstream ss ;
 		ss<<nodeptr->get_construct_name() ;
 		ss<<((void*)nodeptr) ;
-		ss>>filename ;
+        ss>>filename ;
 //		char* tmp = new char[20] ;
 //		sprintf(tmp, "%d", nodeptr) ;
 //		filename = nodeptr->get_construct_name() + tmp ;
@@ -932,7 +932,7 @@ void general_output_generation::output_file(bool single_file)
 		iter = stream_table.begin() ;
 		if(iter == stream_table.end())
 			return ;
-		filename = iter->first+".txt" ;
+		filename = iter->first+".cpp" ;
 		outfile.open( filename.c_str()) ;
 		if(!outfile)
 		{
@@ -1027,7 +1027,7 @@ void print_universal_data(string& stream, universal_data ud)
 
 void print_node_info_func(string& stream, node* nodeptr, general_output_generation* gog)
 {
-	print_rule_elem elem = gog->get_print_rule_elem(nodeptr) ;
+    print_rule_elem elem = gog->get_print_rule_elem(nodeptr) ;
 	pair<string, string> enclose = gog->get_enclose(nodeptr) ;
 
 	if(elem.kind == Func_Name)
@@ -1040,7 +1040,7 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 	{
 		universal_data tmp = nodeptr->get_node_attribute( elem.name) ;
 		if(tmp.get_type_tag() == T_unknown) 
-		{
+        {
 			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
 			exit(-1) ;
 		}

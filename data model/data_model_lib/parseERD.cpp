@@ -118,7 +118,7 @@ node* transToParseTree(Map* physicalERDMap)
                 t->set_t_nt_flag('t');
                 t->set_construct_name("type");
                 stmp.set_value((*pIter).first);
-                t->add_node_attribute("c", stmp);
+                t->add_node_attribute("type", stmp);
                 
                 node* v = new node();
                 v->set_t_nt_flag('t');
@@ -170,6 +170,8 @@ node* transToParseTree(Map* physicalERDMap)
 
         root->push_node_branch(classContent);
         classContent->push_parent_pointer(root);
+        
+        ptree.push_back(root);
     }
     
     node* nt = new node();
@@ -184,3 +186,199 @@ node* transToParseTree(Map* physicalERDMap)
     
     return nt;
 }
+
+//void setup_token_macro_def(string filename, generalized_parser& parser)
+//{
+//    ifstream infile ;
+//    infile.open(filename.c_str()) ;
+//    if(!infile)
+//    {
+//        cout<<"open file fail"<<filename<<endl ;
+//        exit(-1) ;
+//    }
+//    
+//    string type, word, word_tmp ;
+//    int id, value ;
+//    while(infile>>type)
+//    {
+//        if(type == "keyword")
+//        {
+//            infile>>word ;
+//            id = parser.get_symbol_index(word) ;
+//            universal_data empty ;
+//            parser.add_token(id, empty) ;
+//        }
+//        else if(type == "type")
+//        {
+//            infile>>word ;
+//            id = parser.get_symbol_index(type) ;
+//            String tmp ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if(type == "string_value")
+//        {
+//            infile>>word ;
+//            
+//            id = parser.get_symbol_index("value") ;
+//            String tmp ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if (type == "value")
+//        {
+//            infile>>value ;
+//            id = parser.get_symbol_index(type) ;
+//            Int tmp ;
+//            tmp.set_value(value) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if (type == "binary_op")
+//        {
+//            infile>>word ;
+//            id = parser.get_symbol_index(type) ;
+//            String tmp ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if (type == "assign_op")
+//        {
+//            infile>>word ;
+//            id = parser.get_symbol_index(type) ;
+//            String tmp ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if(type == "function_name")
+//        {
+//            infile>>word ;
+//            word.erase(word.end()-1) ;
+//            id = parser.get_symbol_index(type) ;
+//            String tmp ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//            
+//            id = parser.get_symbol_index("(") ;
+//            universal_data empty ;
+//            parser.add_token(id, empty) ;
+//        }
+//        else if (type == "unary_op_f")
+//        {
+//            infile>>word ;
+//            word.erase(word.begin()) ;
+//            word.erase(word.begin()) ;
+//            
+//            String tmp ;
+//            id = parser.get_symbol_index("unary_op") ;
+//            tmp.set_value("++") ;
+//            parser.add_token(id, tmp) ;
+//            
+//            id = parser.get_symbol_index("var") ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if (type == "unary_op_b")
+//        {
+//            infile>>word ;
+//            word.erase(word.end()-1) ;
+//            word.erase(word.end()-1) ;
+//            
+//            String tmp ;
+//            id = parser.get_symbol_index("var") ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//            
+//            id = parser.get_symbol_index("unary_op") ;
+//            tmp.set_value("++") ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else if (type == "unary_op_f2")
+//        {
+//            infile>>word ;
+//            word.erase(word.begin()) ;
+//            
+//            String tmp ;
+//            id = parser.get_symbol_index("unary_op") ;
+//            tmp.set_value("*") ;
+//            parser.add_token(id, tmp) ;
+//            
+//            id = parser.get_symbol_index("var") ;
+//            tmp.set_value(word) ;
+//            parser.add_token(id, tmp) ;
+//        }
+//        else
+//        {
+//            cout<<"unknown type: "<<type<<endl ;
+//            exit(-1) ;
+//        }
+//    }
+//}
+//
+//void macro_definition_input_procedure(string macro_name, string filename)
+//{
+//    map<string, node*>::iterator iter ;
+//    iter = macro_definition_table.find(macro_name) ;
+//    if(iter != macro_definition_table.end())
+//    {
+//        cout<<"macro deinition is existed: "<<macro_name<<endl ;
+//        exit(-1) ;
+//    }
+//    
+//    generalized_parser parser("data_model_lib/physical_model_macro_definition/grammar_rule_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/node_creation_rule_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/associativity_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/precedence_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/general_construct_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/action_file.txt",
+//                              "data_model_lib/physical_model_macro_definition/binding_file.txt") ;
+//    
+//    
+//    setup_token_macro_def(filename, parser) ;
+//    
+//    // show token
+//    /*
+//     cout<<"======show token=========="<<endl;
+//     for(int i = 0 ; i < parser.token_size() ; i++)
+//     {
+//     token* tmp = parser.get_token(i) ;
+//     cout<<"i = "<<i ;
+//     cout<<"token id: "<<tmp->token_id ; 
+//     cout<<"token specifier: "  ;
+//     if(tmp->token_specifier.get_type_tag() != T_unknown)
+//     show_universal_data(tmp->token_specifier) ;
+//     cout<<endl ;
+//     }
+//     cout<<"========================="<<endl ;
+//     */
+//    bool finish ; 
+//    int new_index = 0 ;
+//    int current_index = 0 ;
+//    int construct_id = parser.get_symbol_index("function_definition") ;
+//    
+//    list<pair<string, unsigned*> > acc_vector;
+//    acc_vector.clear() ;
+//    
+//    node* ptptr = NULL ;
+//    
+//    finish = parser.shaped_unified_parse(construct_id, current_index, new_index, acc_vector, ptptr) ;
+//    
+//    if(finish)
+//        cout<<"match succeess "<<new_index<<"	/	"<<parser.token_size()<<endl ;
+//    else 
+//        cout<<"match fail"<<endl ;
+//    
+//    if(finish)
+//    {
+//        node* nodeptr = NULL ;
+//        if(acc_vector.begin()->first == "node")
+//            nodeptr = (node*)(acc_vector.begin()->second) ;
+//        
+//        if(nodeptr == NULL)
+//            exit(-1) ;
+//        
+//        // add definition in macro definition table 
+//        macro_definition_table.insert(pair<string, node*>( macro_name, nodeptr) ) ;
+//    }
+//    else
+//        exit(-1) ;
+//}

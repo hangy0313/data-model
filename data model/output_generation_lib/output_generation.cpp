@@ -1,6 +1,13 @@
 #include "output_generation.h"
 
-general_output_generation::general_output_generation(std::string node_print_rule_file, std::string global_print_table_file, std::string interleave_vector_file, std::string enclose_vector_file, std::string file_root_file, std::string indent_control_table_file, std::string condition_function_table_file)
+general_output_generation::general_output_generation(
+     std::string node_print_rule_file,
+     std::string global_print_table_file,
+     std::string interleave_vector_file,
+     std::string enclose_vector_file,
+     std::string file_root_file,
+     std::string indent_control_table_file,
+     std::string condition_function_table_file)
 {
 	this->initialized_node_print_rule(node_print_rule_file) ;
 	this->initialized_global_print_table(global_print_table_file) ;
@@ -458,12 +465,6 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 	if(indent_iter != indent_control_table.end())
 	{
 		indent_counter = indent_counter + indent_iter->second.indent_num ;
-//		int i  = 0; 
-//		while(i<indent_counter)
-//		{
-//			stream_iter->second = stream_iter->second + " " ;
-//			i++ ;
-//		}
 	}
 
 	// print current node 
@@ -488,12 +489,13 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 	if(nest_print_flag != 'P')
 	{
 //		if(nodeptr->get_branches_size() != 0)
-			if(print_flag)
-				if(enclose_iter != enclose_vector.end())
-					if(enclose_iter->second.first!="")
-						stream_iter->second = stream_iter->second + enclose_iter->second.first +" " ; 
+        if(print_flag)
+            if(enclose_iter != enclose_vector.end())
+                if(enclose_iter->second.first!="")
+                    stream_iter->second = stream_iter->second + enclose_iter->second.first +"" ;
 
-		if(indent_iter != indent_control_table.end())
+		if(indent_iter != indent_control_table.end()
+           && nodeptr->get_construct_name() != "class_content")
 		{
 			if(indent_iter->second.newline) // newline 
 				stream_iter->second = stream_iter->second + "\n" ;
@@ -504,8 +506,9 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 				i++ ;
 			}
 		}
+
 		for(int i = 0 ; i < (int)(nodeptr->node_branch_size()) ; i++)
-		{
+        {
 			if (i >=(int)interleave_iter->second.size()-1 && i != (int)(nodeptr->node_branch_size())-1)
 			{
 				if(interleave_iter->second[interleave_iter->second.size()-2] == "")
@@ -527,7 +530,11 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 				else
 					stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
 			}
-
+            //for public in class_content
+            if(i == 0 && nodeptr->get_construct_name() == "class_content"){
+                stream_iter->second = stream_iter->second + "\n" + "public:";
+            }
+            
 			if(i>0)
 			{
 				if(indent_iter != indent_control_table.end())
@@ -577,7 +584,7 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 			if(print_flag)
 				if(enclose_iter != enclose_vector.end())
 					if(enclose_iter->second.first!="")
-						stream_iter->second = stream_iter->second + enclose_iter->second.second +" " ; 
+						stream_iter->second = stream_iter->second + enclose_iter->second.second +" " ;
 	}
 	else 
 	{
@@ -722,7 +729,7 @@ void general_output_generation::traverse_inorder(node *nodeptr)
 		stringstream ss ;
 		ss<<nodeptr->get_construct_name() ;
 		ss<<((void*)nodeptr) ;
-        ss>>filename ;
+		ss>>filename ;
 //		char* tmp = new char[20] ;
 //		sprintf(tmp, "%d", nodeptr) ;
 //		filename = nodeptr->get_construct_name() + tmp ;
@@ -932,7 +939,7 @@ void general_output_generation::output_file(bool single_file)
 		iter = stream_table.begin() ;
 		if(iter == stream_table.end())
 			return ;
-		filename = iter->first+".cpp" ;
+		filename = "output.cpp" ;
 		outfile.open( filename.c_str()) ;
 		if(!outfile)
 		{
@@ -1027,7 +1034,7 @@ void print_universal_data(string& stream, universal_data ud)
 
 void print_node_info_func(string& stream, node* nodeptr, general_output_generation* gog)
 {
-    print_rule_elem elem = gog->get_print_rule_elem(nodeptr) ;
+	print_rule_elem elem = gog->get_print_rule_elem(nodeptr) ;
 	pair<string, string> enclose = gog->get_enclose(nodeptr) ;
 
 	if(elem.kind == Func_Name)
@@ -1040,7 +1047,7 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 	{
 		universal_data tmp = nodeptr->get_node_attribute( elem.name) ;
 		if(tmp.get_type_tag() == T_unknown) 
-        {
+		{
 			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
 			exit(-1) ;
 		}

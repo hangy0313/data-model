@@ -1,3 +1,0 @@
-1 	binary_op + binary_op - ;
-2	binary_op * binary_op / ;
-3 	unary_op - ;

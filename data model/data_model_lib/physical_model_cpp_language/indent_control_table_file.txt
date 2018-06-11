@@ -1,7 +1,7 @@
 C++ 				0	true
-class_content			2	false
+class_content			4	false
 data_member_sequence		0	true 
 member_function_sequence	0	true 
-statement_sequence 		2 	true 
+statement_sequence 		4 	true 
 variable_sequence 		2	true 
 macros				0 	true

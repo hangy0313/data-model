@@ -1,7 +1,7 @@
 C++				"" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ;
-class_declaration		"" "" "" ";" ;
-class_definition		"" "" "" "" ;
-class_content			"{public:" "" "" "" "" "};" ;
+class_declaration		"" ";" ;
+class_definition		"" ;
+class_content			"{" "" "" "" "" "}" ;
 data_member_sequence		"" ";" ";" ";" ";" ";" ";" ";" ";" ";" ";" ";" ;
 data_member			"" "" "" ; 
 member_function_sequence	"" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ; 

@@ -598,7 +598,7 @@ Map* transferToBinary(ERD* erd)
                 string entityName = rolePtr->getEntityName();
                 
                 //add attribute to new Entity
-                tmpEnity->addAttribute(entityName, "string");
+//                tmpEnity->addAttribute(entityName, "string");
                 
                 //create a Relationship to replace Role
                 Relationship* tmpRelationship = new Relationship("RELATIONSHIP_"+roleName);
@@ -675,7 +675,7 @@ Map* importDirectionDegeneration()
     while(dirDegenerationInput >> roleName){
         Attribute_List* attTmp = new Attribute_List();
         String stringTmp;
-        
+
         dirDegenerationInput >> directionName;
         dirDegenerationInput >> to_entity;
         stringTmp.set_value(to_entity);
@@ -989,6 +989,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     
                     Link nextLink;
                     nextLink.setName("Link"+entityName[0]+"_"+entityName[0]);
+                    nextLink.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp);
                     transEntityPtr1->addNextLink(nextLink);
@@ -1003,12 +1004,13 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     
                     Link nextLink;
                     nextLink.setName("Link"+entityName[1]+"_"+entityName[1]);
+                    nextLink.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp);
                     transEntityPtr2->addNextLink(nextLink);
                 }
                 //E1<->R<->E2
-                if(navigation[0] == "to_entity" && navigation[1] == "to_relationship"){
+                if(navigation[0] == "bidirectional" && navigation[1] == "bidirectional"){
                     Link* linkTmp1 = new Link();
                     linkTmp1->setName("Link_"+entityName[1]+"_"+entityName[0]);
                     linkTmp1->setDirection("to_entity");
@@ -1017,6 +1019,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     
                     Link nextLink1;
                     nextLink1.setName("Link"+entityName[0]+"_"+entityName[0]);
+                    nextLink1.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp1);
                     transEntityPtr1->addNextLink(nextLink1);
@@ -1029,6 +1032,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     
                     Link nextLink2;
                     nextLink2.setName("Link"+entityName[1]+"_"+entityName[1]);
+                    nextLink2.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp2);
                     transEntityPtr2->addNextLink(nextLink2);

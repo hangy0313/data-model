@@ -84,23 +84,41 @@ int main()
     Map* record = new Map();
     Map* physicalERDMap = new Map();
     
-    Entity* e1 = new Entity("E1");
-    e1->addAttribute("test1", "int");
-    Entity* e2 = new Entity("E2");
-    e2->addAttribute("test2", "string");
-    Entity* e3 = new Entity("E3");
-    e3->addAttribute("test3", "char");
-    //
-    Relationship* r1 = new Relationship("R1");
-    //
-    r1->addRole("role1", "E1");
-    r1->addRole("role2", "E2");
-    r1->addRole("role3", "E3");
+    Entity* e1 = new Entity("Cuntomer");
+    e1->addAttribute("name", "string");
+    e1->addAttribute("address", "string");
+    e1->addAttribute("e-mail", "string");
+    
+    Entity* e2 = new Entity("Credit_Card");
+    e2->addAttribute("card_id", "string");
+    
+    Entity* e3 = new Entity("Item");
+    e3->addAttribute("name", "string");
+    e3->addAttribute("price", "int");
+    
+    Entity* e4 = new Entity("Company");
+    e4->addAttribute("name", "string");
+    
+    
+    Relationship* r1 = new Relationship("Has");
+    r1->addRole("owner", "Credit_Card");
+    r1->addRole("has", "Cuntomer");
+    
+    Relationship* r2 = new Relationship("Order");
+    r2->addRole("order", "Cuntomer");
+    r2->addRole("by_order", "Item");
+    
+    Relationship* r3 = new Relationship("Product");
+    r3->addRole("by_product", "Item");
+    r3->addRole("product", "Company");
     
     tmpERD->addEntity(e1);
     tmpERD->addEntity(e2);
     tmpERD->addEntity(e3);
+    tmpERD->addEntity(e4);
     tmpERD->addRelationship(r1);
+    tmpERD->addRelationship(r2);
+    tmpERD->addRelationship(r3);
     
 //    tmpERD->dump();
     
@@ -111,93 +129,18 @@ int main()
 //    dumpNavigationERD(tmpERD);
     
     record = transferToBinary(tmpERD);
-//    dumpNavigationERD(tmpERD);
-    
-    //print record table which record mapping of n-ary relationship and binary relationship
-//    cout << endl << "===============" << endl;
-//    for(record->begin();!record->end();(*record)++){
-//        RelationshipRecord* tmpRecord = (RelationshipRecord*)(record->value());
-//        tmpRecord->dump();
-//    }
-    
+
     directionDegeneration(tmpERD);
-    dumpNavigationERD(tmpERD);
-    
+//    dumpNavigationERD(tmpERD);
+
     embedding(tmpERD, trnasERD);
-    trnasERD->dump();
+//    trnasERD->dump();
     
-//    string test = "Head_Link_E2_RELATIONSHIP_role2";
-//    int pos = test.find("Head_");
-//    cout << pos << endl;
     tansToPhysicalModel(trnasERD, physicalERDMap);
-    
-//    for(physicalERDMap->begin();!physicalERDMap->end();(*physicalERDMap)++){
-//        physicalERD* classPtr = (physicalERD*)(physicalERDMap->value());
-//        cout << "------->" << classPtr->getClassName() << endl;
-//        
-//        list<memberFunctionSchema> functionList = classPtr->getAllMemberFunction();
-//        list<memberFunctionSchema>::iterator functionPtr;
-//        for(functionPtr = functionList.begin();functionPtr != functionList.end();functionPtr++){
-//            node* functionBody = (*functionPtr).functionBody;
-//            string returnType = (*functionPtr).returnType;
-//            string functionName = (*functionPtr).functionName;
-//            list<pair<string, string> > parameters = (*functionPtr).parameters;
-//            list<pair<string, string> >::iterator paramPtr;
-//            
-////            member_function_info mfi = mfs_iter->second ;
-//            cout << "==>" << returnType << " "<< functionName << " (";
-////            list<pair<string, string> >::iterator piter ;
-//            for(paramPtr = parameters.begin();paramPtr != parameters.end();paramPtr++)
-//                cout << (*paramPtr).first << " " << (*paramPtr).second << " ,";
-//            cout << ") {" << endl;
-//            print_parse_tree_mini(functionBody);
-//            cout << "    }"<<endl;
-//        }
-//    }
-//    macro_definition_input_procedure("print_func", "./result.txt") ;
     
     node* ptree = transToParseTree(physicalERDMap);
     
-    general_output_generation gog("data_model_lib/physical_model_cpp_language/node_print_rule_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/global_print_table_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/interleave_vector_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/enclose_vector_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/file_root_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/indent_control_table_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/condition_function_table_file.txt") ;
-    // set precedence
-    initialized_precedence_table("data_model_lib/physical_model_cpp_language/precedence_file.txt") ;
-    // set up node print function
-    string filename = "data_model_lib/physical_model_cpp_language/node_print_function_file.txt" ;
-    ifstream infile(filename.c_str());
-    if(!infile)
-    {
-        cout<<"open file fail "<<filename<<endl;
-        exit(-1) ;
-    }
-    
-    string construct_name;
-    string tmp1, tmp2;
-    while(infile>>construct_name )
-    {
-        infile>>tmp1 ;
-        infile>>tmp2 ;
-        if (tmp1 != "default" || tmp2 != "default")
-        {
-            cout<<"different than default"<<endl ;
-            exit(-1) ;
-        }
-        gog.set_node_print_function(construct_name, print_node_info_func, print_node_info_func);
-    }
-    //set condition function
-    gog.set_condition_fptr("less_than", less_than);
-    
-    // invoke output shaping
-    gog.output_generation(ptree);
-    cout<<"output generation	=> finish"<<endl;
-    
-    gog.output_file(true);
-//    cout<<"output file finish	=> finish"<<endl;
+    outputRealCode(ptree);
     
     return 0;
 }

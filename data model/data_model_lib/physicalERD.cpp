@@ -7,6 +7,9 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
     Map* entityTable = transERD->getEntityTable();
     list<pair<string, string> > paraList;
     
+    Map* relationshipTable = transERD->getRelationshipTable();
+    
+    //foreach entity transfer to class
     for(entityTable->begin();!entityTable->end();(*entityTable)++){
         universal_data nameTmp = entityTable->key();
         
@@ -35,6 +38,70 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
         }
         
         Attribute_List* linkSet = (Attribute_List*)(entityPtr->get_attribute_ref_al("Link_set"));
+        for(linkSet->begin();!linkSet->end();(*linkSet)++){
+            universal_data tmp = linkSet->get_attribute_name_al();
+            string linkName = *(((String*)(&tmp))->getptr());
+            
+            //basic link, head link, next link
+            int pos = linkName.find("_Link");
+            if(linkName.find("_Link") == -1 ||
+               linkName.find("Head_") == 0  ||
+               linkName.find("Next_") == 0)
+            {
+                Link* linkPtr = (Link*)(linkSet->get_attribute_ref_al(linkName));
+                string type = linkPtr->getTargetName();
+                
+                //add data member
+                classPtr->addDataMember(type+"*", linkName, "public");
+                
+                //add basic member function
+                paraList.clear();
+                paraList.push_back(pair<string, string>(type+"*", "var"));
+                classPtr->addMemberFunction("set", "void", linkName, paraList);
+                
+                paraList.clear();
+                classPtr->addMemberFunction("get", type+"*", linkName, paraList);
+            }
+            
+            //list link
+            pos = linkName.find("List_");
+            if(pos == 0){
+                List* listPtr = (List*)(linkSet->get_attribute_ref_al(linkName));
+                listPtr->begin();
+                universal_data tmpData = listPtr->get_attribute();
+                Link* linkTmp = (Link*)(&tmpData);
+                string type = linkTmp->getTargetName();
+                
+                //add data member
+                classPtr->addDataMember("list<"+type+">", linkName, "public");
+                
+                //add basic member function
+                paraList.clear();
+                paraList.push_back(pair<string, string>(type, "var"));
+                classPtr->addMemberFunction("insert", "void", linkName, paraList);
+                classPtr->addMemberFunction("remove", "void", linkName, paraList);
+                
+                paraList.clear();
+                classPtr->addMemberFunction("get", "list<"+type+">", linkName, paraList);
+            }
+        }
+        physicalERDMap->insert(nameTmp, classPtr);
+    }
+    
+    //foreach relationship transfer to class
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        universal_data nameTmp = relationshipTable->key();
+        
+        TransformedRelationship* relationshipPtr = (TransformedRelationship*)(relationshipTable->value());
+        physicalERD* classPtr = new physicalERD(*(((String*)(&nameTmp))->getptr()));
+        
+        Attribute_List* linkSet = (Attribute_List*)(relationshipPtr->get_attribute_ref_al("Link_set"));
+        
+        //there is no link in this relationship, so do not transfer to class
+        if(linkSet->size() == 0){
+            continue;
+        }
+        
         for(linkSet->begin();!linkSet->end();(*linkSet)++){
             universal_data tmp = linkSet->get_attribute_name_al();
             string linkName = *(((String*)(&tmp))->getptr());

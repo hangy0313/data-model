@@ -5,18 +5,16 @@
 #include "cardinalityERD.h"
 #include "navigationERD.h"
 #include "transformedERD.h"
-//#include "segmentationERD.h"
-//#include "logicalERD.h"
 #include "physicalERD.h"
 #include "parseERD.h"
+#include "accessModel.h"
 
 #include "originalERD.cpp"
 #include "cardinalityERD.cpp"
 #include "navigationERD.cpp"
 #include "transformedERD.cpp"
-//#include "segmentationERD.cpp"
-//#include "logicalERD.cpp"
 #include "physicalERD.cpp"
 #include "parseERD.cpp"
+#include "accessModel.cpp"
 
 #endif

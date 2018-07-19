@@ -66,11 +66,8 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
             //list link
             pos = linkName.find("List_");
             if(pos == 0){
-                List* listPtr = (List*)(linkSet->get_attribute_ref_al(linkName));
-                listPtr->begin();
-                universal_data tmpData = listPtr->get_attribute();
-                Link* linkTmp = (Link*)(&tmpData);
-                string type = linkTmp->getTargetName();
+                Link* linkPtr = (Link*)(linkSet->get_attribute_ref_al(linkName));
+                string type = linkPtr->getTargetName();
                 
                 //add data member
                 classPtr->addDataMember("list<"+type+">", linkName, "public");
@@ -130,11 +127,8 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
             //list link
             pos = linkName.find("List_");
             if(pos == 0){
-                List* listPtr = (List*)(linkSet->get_attribute_ref_al(linkName));
-                listPtr->begin();
-                universal_data tmpData = listPtr->get_attribute();
-                Link* linkTmp = (Link*)(&tmpData);
-                string type = linkTmp->getTargetName();
+                Link* linkPtr = (Link*)(linkSet->get_attribute_ref_al(linkName));
+                string type = linkPtr->getTargetName();
                 
                 //add data member
                 classPtr->addDataMember("list<"+type+">", linkName, "public");

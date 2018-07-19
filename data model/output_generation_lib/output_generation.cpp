@@ -1086,11 +1086,11 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 	else if (elem.kind == Attr_Name)
 	{
 		universal_data tmp = nodeptr->get_node_attribute( elem.name) ;
-		if(tmp.get_type_tag() == T_unknown) 
-		{
-			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
-			exit(-1) ;
-		}
+//		if(tmp.get_type_tag() == T_unknown) 
+//		{
+//			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
+//			exit(-1) ;
+//		}
 		if(enclose.first!="")
 			stream = stream + enclose.first + " " ;
 		if(elem.attr_name_flag)

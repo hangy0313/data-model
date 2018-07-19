@@ -338,16 +338,18 @@ void TransformedEntity::removeLink(Link linkName)
 void TransformedEntity::addListLink(Link* linkName)
 {
     Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
-    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
     
-    if(listLinkPtr == NULL){
-        List listmp;
-        listmp.push_back(linkName);
-        
-        linkSet->add_attribute_al("List_"+linkName->getName(), listmp);
-    }else{
-        listLinkPtr->push_back(linkName);
-    }
+    linkSet->add_attribute_al("List_"+linkName->getName(), *linkName);
+//    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
+//    
+//    if(listLinkPtr == NULL){
+//        List* listmp = new List();
+//        listmp->push_back(linkName);
+//        
+//        linkSet->add_attribute_al("List_"+linkName->getName(), *listmp);
+//    }else{
+//        listLinkPtr->push_back(linkName);
+//    }
 }
 
 void TransformedEntity::addHeadLink(Link linkName)
@@ -439,16 +441,17 @@ void TransformedRelationship::removeLink(Link linkName)
 void TransformedRelationship::addListLink(Link* linkName)
 {
     Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
-    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
-    
-    if(listLinkPtr == NULL){
-        List listmp;
-        listmp.push_back(linkName);
-        
-        linkSet->add_attribute_al("List_"+linkName->getName(), listmp);
-    }else{
-        listLinkPtr->push_back(linkName);
-    }
+    linkSet->add_attribute_al("List_"+linkName->getName(), *linkName);
+//    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
+//    
+//    if(listLinkPtr == NULL){
+//        List listmp;
+//        listmp.push_back(linkName);
+//        
+//        linkSet->add_attribute_al("List_"+linkName->getName(), listmp);
+//    }else{
+//        listLinkPtr->push_back(linkName);
+//    }
 }
 
 void TransformedRelationship::addHeadLink(Link linkName)
@@ -814,7 +817,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
     duplicate(erd, transERD);
     Map* transEntityTable = transERD->getEntityTable();
     Map* transRelationshipTable = transERD->getRelationshipTable();
-    
+
     //foreach relationship
     for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
         Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
@@ -854,6 +857,9 @@ void embedding(ERD* erd, TransformedERD* transERD)
             // N/A
             if(decision == "N/A"){
                 for(int index = 0;index < 2;index++){
+                    int targetIndex;
+                    if(index == 0) targetIndex = 1;
+                    else targetIndex = 0;
                     String entityNameTmp;
                     entityNameTmp.set_value(entityName[index]);
                     
@@ -863,12 +869,16 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     if(navigation[index] == "to_entity"){
                         //add link pointer to entity in relationship side
                         Link* linkTmp = new Link();
-                        linkTmp->setName("Link_"+relationshipName+"_"+entityName[index]);
+                        linkTmp->setName("Link_"+entityName[targetIndex]+"_"+relationshipName+"_"+entityName[index]);
                         linkTmp->setDirection("to_entity");
                         linkTmp->setTargetName(entityName[index]);
                         linkTmp->setTrueLink(*transEntityPtr);
                         
-                        transRelationshipPtr->addLink(*linkTmp);
+                        if(max[index] == "1"){
+                            transRelationshipPtr->addLink(*linkTmp);
+                        }else{
+                            transRelationshipPtr->addListLink(linkTmp);
+                        }
                     }
                     if(navigation[index] == "to_relationship"){
                         //add link pointer to relationship in entity side
@@ -891,12 +901,16 @@ void embedding(ERD* erd, TransformedERD* transERD)
                         transEntityPtr->addLink(*linkTmp);
                         
                         //add link pointer to entity in relationship side
-                        linkTmp->setName("Link_"+relationshipName+"_"+entityName[index]);
+                        linkTmp->setName("Link_"+entityName[targetIndex]+"_"+relationshipName+"_"+entityName[index]);
                         linkTmp->setDirection("to_entity");
                         linkTmp->setTargetName(entityName[index]);
                         linkTmp->setTrueLink(*transEntityPtr);
                         
-                        transRelationshipPtr->addLink(*linkTmp);
+                        if(max[index] == "1"){
+                            transRelationshipPtr->addLink(*linkTmp);
+                        }else{
+                            transRelationshipPtr->addListLink(linkTmp);
+                        }
                     }
                 }
             }
@@ -988,7 +1002,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp->setTrueLink(*transEntityPtr1);
                     
                     Link nextLink;
-                    nextLink.setName("Link"+entityName[0]+"_"+entityName[0]);
+                    nextLink.setName("Link_"+entityName[0]);
                     nextLink.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp);
@@ -1003,7 +1017,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp->setTrueLink(*transEntityPtr2);
                     
                     Link nextLink;
-                    nextLink.setName("Link"+entityName[1]+"_"+entityName[1]);
+                    nextLink.setName("Link_"+entityName[1]);
                     nextLink.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp);
@@ -1018,7 +1032,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp1->setTrueLink(*transEntityPtr1);
                     
                     Link nextLink1;
-                    nextLink1.setName("Link"+entityName[0]+"_"+entityName[0]);
+                    nextLink1.setName("Link_"+entityName[0]);
                     nextLink1.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp1);
@@ -1031,7 +1045,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp2->setTrueLink(*transEntityPtr2);
                     
                     Link nextLink2;
-                    nextLink2.setName("Link"+entityName[1]+"_"+entityName[1]);
+                    nextLink2.setName("Link_"+entityName[1]);
                     nextLink2.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp2);
@@ -1050,7 +1064,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp->setTrueLink(*transRelationshipPtr);
                     
                     Link nextLink;
-                    nextLink.setName("Link_"+relationshipName+"_"+entityName[0]);
+                    nextLink.setName("Link_"+entityName[1]+"_"+relationshipName+"_"+entityName[0]);
                     nextLink.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp);
@@ -1065,7 +1079,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp->setTrueLink(*transRelationshipPtr);
                     
                     Link nextLink;
-                    nextLink.setName("Link_"+relationshipName+"_"+entityName[1]);
+                    nextLink.setName("Link_"+entityName[0]+"_"+relationshipName+"_"+entityName[1]);
                     nextLink.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp);
@@ -1080,7 +1094,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp1->setTrueLink(*transRelationshipPtr);
                     
                     Link nextLink1;
-                    nextLink1.setName("Link_"+relationshipName+"_"+entityName[0]);
+                    nextLink1.setName("Link_"+entityName[1]+"_"+relationshipName+"_"+entityName[0]);
                     nextLink1.setTargetName(entityName[0]);
                     
                     transEntityPtr2->addHeadLink(*linkTmp1);
@@ -1093,7 +1107,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp2->setTrueLink(*transRelationshipPtr);
                     
                     Link nextLink2;
-                    nextLink2.setName("Link_"+relationshipName+"_"+entityName[1]);
+                    nextLink2.setName("Link_"+entityName[0]+"_"+relationshipName+"_"+entityName[1]);
                     nextLink2.setTargetName(entityName[1]);
                     
                     transEntityPtr1->addHeadLink(*linkTmp2);
@@ -1115,7 +1129,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     transEntityPtr2->addHeadLink(*linkTmp1);
                     
                     Link* linkTmp2 = new Link();
-                    linkTmp2->setName("Link_"+relationshipName+"_"+entityName[0]);
+                    linkTmp2->setName("Link_"+entityName[1]+"_"+relationshipName+"_"+entityName[0]);
                     linkTmp2->setDirection("to_entity");
                     linkTmp2->setTargetName(entityName[0]);
                     linkTmp2->setTrueLink(*transEntityPtr1);
@@ -1134,7 +1148,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     transEntityPtr1->addHeadLink(*linkTmp1);
                     
                     Link* linkTmp2 = new Link();
-                    linkTmp2->setName("Link_"+relationshipName+"_"+entityName[1]);
+                    linkTmp2->setName("Link_"+entityName[0]+"_"+relationshipName+"_"+entityName[1]);
                     linkTmp2->setDirection("to_entity");
                     linkTmp2->setTargetName(entityName[1]);
                     linkTmp2->setTrueLink(*transEntityPtr2);
@@ -1158,8 +1172,25 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     linkTmp2->setTargetName(entityName[1]);
                     linkTmp2->setTrueLink(*transEntityPtr2);
                     
-                    transEntityPtr2->addHeadLink(*linkTmp1);
+//                    transEntityPtr2->addHeadLink(*linkTmp1);
                     transRelationshipPtr->addListLink(linkTmp2);
+                    
+                    Link* linkTmp3 = new Link();
+                    linkTmp3->setName("Link_"+entityName[1]+"_"+relationshipName);
+                    linkTmp3->setDirection("to_relationship");
+                    linkTmp3->setTargetName(relationshipName);
+                    linkTmp3->setTrueLink(*transRelationshipPtr);
+                    
+                    transEntityPtr2->addHeadLink(*linkTmp3);
+                    
+                    Link* linkTmp4 = new Link();
+                    linkTmp4->setName("Link_"+relationshipName+"_"+entityName[0]);
+                    linkTmp4->setDirection("to_entity");
+                    linkTmp4->setTargetName(entityName[0]);
+                    linkTmp4->setTrueLink(*transEntityPtr1);
+                    
+                    //                    transEntityPtr2->addHeadLink(*linkTmp1);
+                    transRelationshipPtr->addListLink(linkTmp4);
                 }
             }
         }

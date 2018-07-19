@@ -83,42 +83,22 @@ int main()
     TransformedERD* trnasERD = new TransformedERD(tmpERD->getERDName());
     Map* record = new Map();
     Map* physicalERDMap = new Map();
+//test 1:1 binary
+    Entity* e1 = new Entity("Customer");
     
-    Entity* e1 = new Entity("Cuntomer");
-    e1->addAttribute("name", "string");
-    e1->addAttribute("address", "string");
-    e1->addAttribute("e-mail", "string");
+    Entity* e2 = new Entity("Product");
     
-    Entity* e2 = new Entity("Credit_Card");
-    e2->addAttribute("card_id", "string");
+
     
-    Entity* e3 = new Entity("Item");
-    e3->addAttribute("name", "string");
-    e3->addAttribute("price", "int");
-    
-    Entity* e4 = new Entity("Company");
-    e4->addAttribute("name", "string");
-    
-    
-    Relationship* r1 = new Relationship("Has");
-    r1->addRole("owner", "Credit_Card");
-    r1->addRole("has", "Cuntomer");
-    
-    Relationship* r2 = new Relationship("Order");
-    r2->addRole("order", "Cuntomer");
-    r2->addRole("by_order", "Item");
-    
-    Relationship* r3 = new Relationship("Product");
-    r3->addRole("by_product", "Item");
-    r3->addRole("product", "Company");
+    Relationship* r1 = new Relationship("Order");
+    r1->addRole("Cus", "Customer");
+    r1->addRole("Pro", "Product");
+
     
     tmpERD->addEntity(e1);
     tmpERD->addEntity(e2);
-    tmpERD->addEntity(e3);
-    tmpERD->addEntity(e4);
     tmpERD->addRelationship(r1);
-    tmpERD->addRelationship(r2);
-    tmpERD->addRelationship(r3);
+    
     
 //    tmpERD->dump();
     
@@ -135,7 +115,7 @@ int main()
 
     embedding(tmpERD, trnasERD);
 //    trnasERD->dump();
-    
+//
     tansToPhysicalModel(trnasERD, physicalERDMap);
     
     node* ptree = transToParseTree(physicalERDMap);

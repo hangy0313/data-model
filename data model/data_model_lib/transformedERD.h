@@ -17,7 +17,7 @@ class Link;
 /*
  *  data member : Relationship, Transformed Entity set and Relationship set
  */
-class RelationshipRecord : public Attribute_List
+class RelationshipRecord : public UD_Attribute_List
 {
 public:
     RelationshipRecord(string name);
@@ -32,8 +32,8 @@ public:
     void addTransformedEntity(Entity* entiyty);
     void addTransformedRelationship(Relationship* relationship);
     
-    Map* getTransformedEntitySet();
-    Map* getTransformedRelationshipSet();
+    UD_Map* getTransformedEntitySet();
+    UD_Map* getTransformedRelationshipSet();
     
     void dump();
 };
@@ -41,7 +41,7 @@ public:
 /*
  *  member data : name, tansformed entity table, tansformed relationship table
  */
-class TransformedERD : public Attribute_List
+class TransformedERD : public UD_Attribute_List
 {
 public:
     TransformedERD(string erdName);
@@ -49,8 +49,8 @@ public:
     
     void setERDName(string erdName);
     string getERDName();
-    Map* getEntityTable();
-    Map* getRelationshipTable();
+    UD_Map* getEntityTable();
+    UD_Map* getRelationshipTable();
     void addEntity(TransformedEntity* en);
     void removeEntity(string entityName);
     void addRelationship(TransformedRelationship* relationship);
@@ -64,7 +64,7 @@ public:
 /*
  *  member data : name, attribute set, link set
  */
-class TransformedEntity : public Attribute_List
+class TransformedEntity : public UD_Attribute_List
 {
 public:
     TransformedEntity();
@@ -75,9 +75,9 @@ public:
     string getEntityName();
     
     void addAttribute(string attributeName, string attributeType);
-    void addAttribute(Attribute_List tmpAttribute);
+    void addAttribute(UD_Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
-    Attribute_List* getAttributeList();
+    UD_Attribute_List* getAttributeList();
     
     void addLink(Link linkName);
     void removeLink(Link linkName);
@@ -92,7 +92,7 @@ public:
 /*
  *  member data : name, link set
  */
-class TransformedRelationship : public Attribute_List
+class TransformedRelationship : public UD_Attribute_List
 {
 public:
     TransformedRelationship();
@@ -118,7 +118,7 @@ public:
  *                symbolic link,
  *                true link
  */
-class Link : public Attribute_List
+class Link : public UD_Attribute_List
 {
 public:
 public:
@@ -133,17 +133,17 @@ public:
     string getDirection();
     void setTargetName(string name);
     string getTargetName();
-    void setTrueLink(universal_data utmp);
-    universal_data* getTrueLink();
+    void setTrueLink(UD_universal_data utmp);
+    UD_universal_data* getTrueLink();
 };
 
-Map* transferToBinary(ERD* erd);
+UD_Map* transferToBinary(ERD* erd);
 
-Map* importDirectionDegeneration();
-void directionDegeneration(ERD* erd);
+UD_Map* importDirectionDegeneration(string dirDegenerationScript);
+void directionDegeneration(ERD* erd, string dirDegenerationScript);
 
-Map* importEmbedding();
+UD_Map* importEmbedding(string embeddingScript);
 void duplicate(ERD* erd, TransformedERD* transERD);
-void embedding(ERD* erd, TransformedERD* transERD);
+TransformedERD* embedding(ERD* erd, string embeddingScript);
 
 #endif

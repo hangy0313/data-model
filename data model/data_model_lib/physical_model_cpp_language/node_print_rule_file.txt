@@ -20,6 +20,7 @@ statement 			string_value ""
 assignment_statement		attribute_name	F	assign_op 
 branch_statement		string_value "" 
 for_loop			string_value "for" 
+while_loop			string_value "while"
 function_call			string_value "" 
 return_process			string_value "return" 
 element				string_value "" 

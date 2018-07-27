@@ -1,15 +1,16 @@
+/* --------------------------------------------------------------- */
+/* (C) Copyright 2018	                                           */
+/* Owner: Tsung Lee, Yao-Yi Huang							   	   */
+/* All Rights Reserved.                                            */
+/* --------------------------------------------------------------- */
 #ifndef UNIVERSAL_DATA_LIB_H
 #define UNIVERSAL_DATA_LIB_H
 
-#include "stdlib.h"
-#include "enumerate_constant.h"
-#include "predeclare.h"
+#include "UD_predeclaration.h"
 #include "universal_data.h"
-#include "universal_data_extend.h"
-#include "create_iterator_function.h"
+#include "UD_graph.h"
 
 #include "universal_data.cpp"
-#include "universal_data_extend.cpp"
-#include "create_iterator_function.cpp"
+#include "UD_graph.cpp"
 
 #endif 

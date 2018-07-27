@@ -2,29 +2,30 @@
 
 using namespace std;
 
-void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
+UD_Map* tansToPhysicalModel(TransformedERD* transERD)
 {
-    Map* entityTable = transERD->getEntityTable();
+    UD_Map* physicalERDMap = new UD_Map();
+    UD_Map* entityTable = transERD->getEntityTable();
     list<pair<string, string> > paraList;
     
-    Map* relationshipTable = transERD->getRelationshipTable();
+    UD_Map* relationshipTable = transERD->getRelationshipTable();
     
     //foreach entity transfer to class
     for(entityTable->begin();!entityTable->end();(*entityTable)++){
-        universal_data nameTmp = entityTable->key();
+        UD_universal_data nameTmp = entityTable->key();
         
         TransformedEntity* entityPtr = (TransformedEntity*)(entityTable->value());
-        physicalERD* classPtr = new physicalERD(*(((String*)(&nameTmp))->getptr()));
+        physicalERD* classPtr = new physicalERD(*(((UD_String*)(&nameTmp))->getptr()));
         
         //add data member and basic function for attribute list
-        Attribute_List* attList = entityPtr->getAttributeList();
+        UD_Attribute_List* attList = entityPtr->getAttributeList();
         for(attList->begin();!attList->end();(*attList)++){
             //add data member
-            universal_data name = attList->get_attribute_name_al();
-            universal_data type = attList->get_attribute_value_al();
+            UD_universal_data name = attList->get_attribute_name_al();
+            UD_universal_data type = attList->get_attribute_value_al();
             
-            string nameString = *(((String*)(&name))->getptr());
-            string typeString = *(((String*)(&type))->getptr());
+            string nameString = *(((UD_String*)(&name))->getptr());
+            string typeString = *(((UD_String*)(&type))->getptr());
             
             classPtr->addDataMember(typeString, nameString, "public");
             
@@ -37,10 +38,10 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
             classPtr->addMemberFunction("get", typeString, nameString, paraList);
         }
         
-        Attribute_List* linkSet = (Attribute_List*)(entityPtr->get_attribute_ref_al("Link_set"));
+        UD_Attribute_List* linkSet = (UD_Attribute_List*)(entityPtr->get_attribute_ref_al("Link_set"));
         for(linkSet->begin();!linkSet->end();(*linkSet)++){
-            universal_data tmp = linkSet->get_attribute_name_al();
-            string linkName = *(((String*)(&tmp))->getptr());
+            UD_universal_data tmp = linkSet->get_attribute_name_al();
+            string linkName = *(((UD_String*)(&tmp))->getptr());
             
             //basic link, head link, next link
             int pos = linkName.find("_Link");
@@ -87,12 +88,12 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
     
     //foreach relationship transfer to class
     for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
-        universal_data nameTmp = relationshipTable->key();
+        UD_universal_data nameTmp = relationshipTable->key();
         
         TransformedRelationship* relationshipPtr = (TransformedRelationship*)(relationshipTable->value());
-        physicalERD* classPtr = new physicalERD(*(((String*)(&nameTmp))->getptr()));
+        physicalERD* classPtr = new physicalERD(*(((UD_String*)(&nameTmp))->getptr()));
         
-        Attribute_List* linkSet = (Attribute_List*)(relationshipPtr->get_attribute_ref_al("Link_set"));
+        UD_Attribute_List* linkSet = (UD_Attribute_List*)(relationshipPtr->get_attribute_ref_al("Link_set"));
         
         //there is no link in this relationship, so do not transfer to class
         if(linkSet->size() == 0){
@@ -100,8 +101,8 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
         }
         
         for(linkSet->begin();!linkSet->end();(*linkSet)++){
-            universal_data tmp = linkSet->get_attribute_name_al();
-            string linkName = *(((String*)(&tmp))->getptr());
+            UD_universal_data tmp = linkSet->get_attribute_name_al();
+            string linkName = *(((UD_String*)(&tmp))->getptr());
             
             //basic link, head link, next link
             int pos = linkName.find("_Link");
@@ -145,6 +146,8 @@ void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap)
         }
         physicalERDMap->insert(nameTmp, classPtr);
     }
+    
+    return physicalERDMap;
 }
 
 physicalERD::physicalERD(string name)
@@ -217,7 +220,7 @@ void physicalERD::addMemberFunction(string prefix,
 {
     struct memberFunctionSchema tmpFunction;
     
-    String stmp;
+    UD_String stmp;
     string functionName = prefix + "_"+suffix;
     
     tmpFunction.returnType = rtype;
@@ -304,19 +307,15 @@ void physicalERD::addMemberFunction(string prefix,
         plist->set_t_nt_flag('n');
         plist->set_construct_name("parameter_list");
         
-        list<string> pars;
-        pars.push_back(tmpIter->second);
-        list<string>::iterator iter;
-        for(iter = pars.begin();iter != pars.end();iter++){
-            node* p = new node();
-            p->set_t_nt_flag('t');
-            p->set_construct_name("var");
-            stmp.set_value(*iter);
-            obj->add_node_attribute("var", stmp);
-            
-            plist->push_node_branch(p);
-            p->push_parent_pointer(plist);
-        }
+        node* p = new node();
+        p->set_t_nt_flag('t');
+        p->set_construct_name("var");
+        stmp.set_value("var");
+        p->add_node_attribute("var", stmp);
+        
+        plist->push_node_branch(p);
+        p->push_parent_pointer(plist);
+        
         objectCallFunc->push_node_branch(obj);
         obj->push_parent_pointer(objectCallFunc);
 
@@ -338,9 +337,7 @@ void physicalERD::addMemberFunction(string prefix,
         list<pair<string, string> >::iterator tmpIter;
         
         tmpIter = plist.begin();
-        
-//        node* obj = ptree_create_t_node("var") ;
-//        ptree_add_attribute(obj, "var", elem) ;
+
         node* obj = new node();
         obj->set_t_nt_flag('t');
         obj->set_construct_name("var");
@@ -361,20 +358,15 @@ void physicalERD::addMemberFunction(string prefix,
         plist->set_t_nt_flag('n');
         plist->set_construct_name("parameter_list");
         
-        list<string> pars;
-        pars.push_back(tmpIter->second);
-        list<string>::iterator iter;
-        for(iter = pars.begin();iter != pars.end();iter++){
-            node* p = new node();
-            p->set_t_nt_flag('t');
-            p->set_construct_name("var");
-            stmp.set_value(*iter);
-            obj->add_node_attribute("var", stmp);
-            
-            plist->push_node_branch(p);
-            p->push_parent_pointer(plist);
-        }
+        node* p = new node();
+        p->set_t_nt_flag('t');
+        p->set_construct_name("var");
+        stmp.set_value("var");
+        p->add_node_attribute("var", stmp);
         
+        plist->push_node_branch(p);
+        p->push_parent_pointer(plist);
+
         objectCallFunc->push_node_branch(obj);
         obj->push_parent_pointer(objectCallFunc);
         

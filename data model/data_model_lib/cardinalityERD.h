@@ -17,12 +17,12 @@ struct cardinalitySchema{
 /*
  *  import cardinality info
  */
-list<cardinalitySchema> importCardinalityInfo();
+list<cardinalitySchema> importCardinalityInfo(string cardiScript);
 
 /*
  *  Role add data member : Cardinality(Minimum, Maximum)
  */
-void addCardinalityToERD(ERD* erd);
+void addCardinalityToERD(ERD* erd, string cardiScript);
 
 /*
  *  Dump ERD info after add cardinality

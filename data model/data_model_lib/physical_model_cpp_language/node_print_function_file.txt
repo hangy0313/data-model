@@ -20,6 +20,7 @@ statement 				default	default
 assignment_statement			default	default
 branch_statement			default	default
 for_loop				default	default
+while_loop				default	default
 function_call				default	default 
 return_process				default	default
 element					default	default

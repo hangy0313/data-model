@@ -9,7 +9,7 @@
 #include <fstream>
 #include "token.h"
 #include "grammar_rule.h"
-#include "../universal_data_lib/universal_data.h"
+#include "../universal_data_lib/universal_data_lib.h"
 #include "hierarchical_node_composition.h"
 
 using namespace std ;
@@ -69,7 +69,7 @@ public :
 	bool shaped_unified_parse(int construct_id, int current_token_index, int& new_token_index, list<pair<string, unsigned*> >& acc_vector, node* &parse_tree_ptr) ;
 
 	// set up token seq
-	void add_token(int token_id, universal_data token_specifier) ; // push back in token seq
+	void add_token(int token_id, UD_universal_data token_specifier) ; // push back in token seq
 	void remove_token() ; // pop back from token seq
 	int token_size() ;
 	token* get_token(int index) ;

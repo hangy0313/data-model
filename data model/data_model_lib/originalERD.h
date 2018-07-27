@@ -12,15 +12,10 @@ class Entity;
 class Relationship;
 class Role;
 
-struct attributeSchema{
-    string type;
-    string name;
-};
-
 /*
  *  member data : name, entity table, relationship table
  */
-class ERD : public Attribute_List
+class ERD : public UD_Attribute_List
 {
 public:
     ERD(string erdName);
@@ -28,8 +23,8 @@ public:
 
     void setERDName(string erdName);
     string getERDName();
-    Map* getEntityTable();
-    Map* getRelationshipTable();
+    UD_Map* getEntityTable();
+    UD_Map* getRelationshipTable();
     void addEntity(Entity* en);
     void removeEntity(string entityName);
     void addRelationship(Relationship* relationship);
@@ -43,7 +38,7 @@ public:
 /*
  *  member data : name, attribute set
  */
-class Entity : public Attribute_List
+class Entity : public UD_Attribute_List
 {
 public:
     Entity();
@@ -54,9 +49,9 @@ public:
     string getEntityName();
     
     void addAttribute(string attributeName,string attributeType);
-    void addAttribute(Attribute_List tmpAttribute);
+    void addAttribute(UD_Attribute_List tmpAttribute);
     void removeAttribute(string attributeName);
-    Attribute_List* getAttributeList();
+    UD_Attribute_List* getAttributeList();
     
     void dump();
 };
@@ -64,7 +59,7 @@ public:
 /*
  *  member data : name, role set
  */
-class Relationship : public Attribute_List
+class Relationship : public UD_Attribute_List
 {
 public:
     Relationship();
@@ -78,7 +73,7 @@ public:
     void addRole(string roleName,string entityName);
     void removeRole(string roleName);
     Role* findRole(string roleName);
-    Attribute_List* getRoleList();
+    UD_Attribute_List* getRoleList();
     
     void dump();
     
@@ -88,7 +83,7 @@ public:
 /*
  *  member data : name, entity name
  */
-class Role : public Attribute_List
+class Role : public UD_Attribute_List
 {
 public:
     Role();
@@ -101,5 +96,7 @@ public:
     void setEntityName(string entityName);
     string getEntityName();
 };
+
+ERD* import(string erdScript);
 
 #endif

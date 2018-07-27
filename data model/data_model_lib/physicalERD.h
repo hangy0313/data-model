@@ -5,7 +5,7 @@
 #include "../generalized_parser_lib/generalized_parser_lib.h"
 #include <iostream>
 
-void tansToPhysicalModel(TransformedERD* transERD, Map* physicalERDMap);
+UD_Map* tansToPhysicalModel(TransformedERD* transERD);
 
 struct dataMemberSchema
 {
@@ -22,7 +22,7 @@ struct memberFunctionSchema
     node* functionBody;
 };
 
-class physicalERD : public universal_data
+class physicalERD : public UD_universal_data
 {
 public:
     physicalERD(string name);

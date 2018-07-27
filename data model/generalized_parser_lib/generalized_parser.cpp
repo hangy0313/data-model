@@ -25,7 +25,7 @@ using namespace std ;
 	else \
 	{ \
 		string attr_name = node_creation_table.find(get_construct_name(construct_id))->second.attribute_name ; \
-		pair<string, universal_data>* attr_tmp = new pair<string, universal_data>(attr_name, token_seq[new_token_index]->token_specifier) ; \
+		pair<string, UD_universal_data>* attr_tmp = new pair<string, UD_universal_data>(attr_name, token_seq[new_token_index]->token_specifier) ; \
 		acc_vector.push_back(pair<string, unsigned*>("attribute", (unsigned*)(attr_tmp) ) ) ; \
 	} 
 
@@ -53,9 +53,9 @@ using namespace std ;
 			}\
 			else \
 			{/*attribute*/ \
-				pair<string, universal_data> attr_tmp ;  \
-				attr_tmp.first = ((pair<string, universal_data>*)(iter->second))->first ; \
-				attr_tmp.second = ((pair<string, universal_data>*)(iter->second))->second ; \
+				pair<string, UD_universal_data> attr_tmp ;  \
+				attr_tmp.first = ((pair<string, UD_universal_data>*)(iter->second))->first ; \
+				attr_tmp.second = ((pair<string, UD_universal_data>*)(iter->second))->second ; \
 				nodeptr->add_node_attribute( attr_tmp.first, attr_tmp.second) ; \
 			}\
 		}\
@@ -206,7 +206,7 @@ void generalized_parser::initialize_grammar_rule(std::string filename)
 	// open file 
 	infile.open(filename.c_str()) ;
 	if(!infile){
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 	// read file 
@@ -406,7 +406,7 @@ void generalized_parser::initialize_node_creation_rule(std::string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 	infile>>name ;
@@ -466,7 +466,7 @@ void generalized_parser::initialize_associativity(std::string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 	infile>>name ;
@@ -515,7 +515,7 @@ void generalized_parser::initialize_precedence(std::string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 
@@ -563,7 +563,7 @@ void generalized_parser::initialize_general_constuct_name(std::string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 
@@ -602,7 +602,7 @@ void generalized_parser::initialize_action_table(string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 	while(infile>>construct_name) 
@@ -627,7 +627,7 @@ void generalized_parser::initialize_binding_table(std::string filename)
 	infile.open(filename.c_str()) ;
 	if(!infile)
 	{
-		cout<<"open file fail"<<endl ;
+		cout<<"open file fail: "<<filename<<endl ;
 		exit(-1) ;
 	}
 	while(infile>>construct_name) 
@@ -749,7 +749,7 @@ bool generalized_parser::shaped_unified_parse(int construct_id, int current_toke
 	return return_val ;
 }
 
-void generalized_parser::add_token(int token_id, universal_data token_specifier)
+void generalized_parser::add_token(int token_id, UD_universal_data token_specifier)
 {
 	token* tmp = new token ;
 	tmp->token_id = token_id ;
@@ -844,12 +844,12 @@ bool generalized_parser::compute_associativity_shaping(node *nodeptr, node *chil
 		for(liter = iter->second.begin() ; liter != iter->second.end(); liter++)
 			if( liter->next_level_construct_name == childptr->get_construct_name())
 			{
-				universal_data elem1 = nodeptr->get_node_attribute(liter->attr_name) ; // parent 
-				universal_data elem2 = childptr->get_node_attribute(liter->next_level_attr_name) ; // child 
+				UD_universal_data elem1 = nodeptr->get_node_attribute(liter->attr_name) ; // parent 
+				UD_universal_data elem2 = childptr->get_node_attribute(liter->next_level_attr_name) ; // child 
 		
 				if( (elem1.get_type_tag() != T_unknown) && (elem2.get_type_tag() != T_unknown)){
-					string value1 = *(((String*)(&elem1))->getptr()) ;
-					string value2 = *(((String*)(&elem2))->getptr()) ;
+					string value1 = *(((UD_String*)(&elem1))->getptr()) ;
+					string value2 = *(((UD_String*)(&elem2))->getptr()) ;
 					if(value1 == value2)
 						return true ;
 				}
@@ -872,7 +872,7 @@ pair<bool, string> generalized_parser::compute_precedence_shaping(node *nodeptr,
 		int next_token = token_seq[next_token_index]->token_id ;
 		
 		string kindtmp ;
-		universal_data tmp = nodeptr->get_node_attribute("binary_op") ;
+		UD_universal_data tmp = nodeptr->get_node_attribute("binary_op") ;
 		kindtmp = "binary_op" ;
 		if(tmp.get_type_tag() == T_unknown){
 			tmp = nodeptr->get_node_attribute("unary_op") ;
@@ -886,12 +886,12 @@ pair<bool, string> generalized_parser::compute_precedence_shaping(node *nodeptr,
 				precedence_flag = true ;
 				precedence_elem current_tmp, next_tmp ;
 				current_tmp.type = kindtmp ;
-				current_tmp.elem = *(((String*)(&tmp))->getptr()) ;
+				current_tmp.elem = *(((UD_String*)(&tmp))->getptr()) ;
 				if(next_token == get_symbol_index("binary_op"))
 					next_tmp.type = "binary_op" ;
 				else 
 					next_tmp.type = "unary_op" ;
-				next_tmp.elem = *( ((String*)(&(token_seq[next_token_index]->token_specifier)))->getptr() ) ;
+				next_tmp.elem = *( ((UD_String*)(&(token_seq[next_token_index]->token_specifier)))->getptr() ) ;
 
 				for(iter = precedence_table.begin(); iter != precedence_table.end() ; iter++)
 				{
@@ -927,7 +927,7 @@ void generalized_parser::associativity_restructuring(node *nodeptr)
 	vector<node*> reshape_vector ;
 	vector<node*> reclaim_vector ;
 
-	Virtual_Iterator* biter = nodeptr->get_node_branch_iter() ;
+	UD_Virtual_Iterator* biter = nodeptr->get_node_branch_iter() ;
 	for(biter->begin() ; !biter->end() ; biter->advance()){
 		node* tmp = (node*)(*(*biter)) ;
 		if(tmp->get_t_nt_flag() == 't') // the subtree is a leaf
@@ -944,7 +944,7 @@ void generalized_parser::associativity_restructuring(node *nodeptr)
 		}
 		else // flatten the subtree with associativity 
 		{
-			Virtual_Iterator* biter2 = tmp->get_node_branch_iter() ;
+			UD_Virtual_Iterator* biter2 = tmp->get_node_branch_iter() ;
 			for(biter2->begin() ; !biter2->end() ; biter2->advance())
 				reshape_vector.push_back( (node*)(*(*biter2))) ;
 			reclaim_vector.push_back(tmp) ;

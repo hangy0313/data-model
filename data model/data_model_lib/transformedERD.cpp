@@ -5,8 +5,8 @@ using namespace std;
 RelationshipRecord::RelationshipRecord(string name)
 {
     Relationship tmpRelationship;
-    Attribute_List transformedInfo;
-    Map tmpMap;
+    UD_Attribute_List transformedInfo;
+    UD_Map tmpMap;
     
     setName(name);
     
@@ -24,10 +24,10 @@ RelationshipRecord::~RelationshipRecord()
 
 void RelationshipRecord::setName(string name)
 {
-    String tmp;
+    UD_String tmp;
     tmp.set_value(name);
     
-    universal_data* ptr = get_attribute_ref_al("Name");
+    UD_universal_data* ptr = get_attribute_ref_al("Name");
     if(ptr != NULL) {
         set_attribute_al("Name", tmp);
     } else {
@@ -37,7 +37,7 @@ void RelationshipRecord::setName(string name)
 
 string RelationshipRecord::getName()
 {
-    return *(((String*)(get_attribute_ref_al("Name")))->getptr());
+    return *(((UD_String*)(get_attribute_ref_al("Name")))->getptr());
 }
 
 void RelationshipRecord::setSourceRelationship(Relationship* relationship)
@@ -52,10 +52,10 @@ Relationship* RelationshipRecord::getSourceRelationship()
 
 void RelationshipRecord::addTransformedEntity(Entity* entity)
 {
-    String stringTmp;
-    Attribute_List* tmp =  (Attribute_List*)(get_attribute_ref_al("Transformed_info"));
+    UD_String stringTmp;
+    UD_Attribute_List* tmp =  (UD_Attribute_List*)(get_attribute_ref_al("Transformed_info"));
     
-    Map* transformedEntitySet = (Map*)(tmp->get_attribute_ref_al("Entity_set"));
+    UD_Map* transformedEntitySet = (UD_Map*)(tmp->get_attribute_ref_al("Entity_set"));
     stringTmp.set_value(entity->getEntityName());
     
     transformedEntitySet->insert(stringTmp, entity);
@@ -63,27 +63,27 @@ void RelationshipRecord::addTransformedEntity(Entity* entity)
 
 void RelationshipRecord::addTransformedRelationship(Relationship* relationship)
 {
-    String stringTmp;
-    Attribute_List* tmp =  (Attribute_List*)(get_attribute_ref_al("Transformed_info"));
+    UD_String stringTmp;
+    UD_Attribute_List* tmp =  (UD_Attribute_List*)(get_attribute_ref_al("Transformed_info"));
     
-    Map* transformedRelationshipSet = (Map*)(tmp->get_attribute_ref_al("Relationship_set"));
+    UD_Map* transformedRelationshipSet = (UD_Map*)(tmp->get_attribute_ref_al("Relationship_set"));
     stringTmp.set_value(relationship->getRelationshipName());
     
     transformedRelationshipSet->insert(stringTmp, relationship);
 }
 
-Map* RelationshipRecord::getTransformedEntitySet()
+UD_Map* RelationshipRecord::getTransformedEntitySet()
 {
-    Attribute_List* tmp =  (Attribute_List*)(get_attribute_ref_al("Transformed_info"));
+    UD_Attribute_List* tmp =  (UD_Attribute_List*)(get_attribute_ref_al("Transformed_info"));
     
-    return (Map*)(tmp->get_attribute_ref_al("Entity_set"));
+    return (UD_Map*)(tmp->get_attribute_ref_al("Entity_set"));
 }
 
-Map* RelationshipRecord::getTransformedRelationshipSet()
+UD_Map* RelationshipRecord::getTransformedRelationshipSet()
 {
-    Attribute_List* tmp =  (Attribute_List*)(get_attribute_ref_al("Transformed_info"));
+    UD_Attribute_List* tmp =  (UD_Attribute_List*)(get_attribute_ref_al("Transformed_info"));
     
-    return (Map*)(tmp->get_attribute_ref_al("Relationship_set"));
+    return (UD_Map*)(tmp->get_attribute_ref_al("Relationship_set"));
 }
 
 void RelationshipRecord::dump()
@@ -93,18 +93,18 @@ void RelationshipRecord::dump()
     Relationship* tmpRelationship = getSourceRelationship();
     cout << "==========" << endl;
     cout << "Relationship Name : " << tmpRelationship->getRelationshipName() << endl;
-    Attribute_List* roleList = tmpRelationship->getRoleList();
+    UD_Attribute_List* roleList = tmpRelationship->getRoleList();
     for(roleList->begin();!roleList->end();(*roleList)++){
         Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
-        Attribute_List* car = (Attribute_List*)(role->get_attribute_ref_al("Cardinality"));
+        UD_Attribute_List* car = (UD_Attribute_List*)(role->get_attribute_ref_al("Cardinality"));
         
         cout << "******" << endl;
         cout << "Role name : " << role->getRoleName()
         << ", Entity name : " << role->getEntityName() << endl;
         
         if(car != NULL){
-            String* min = (String*)(car->get_attribute_ref_al("Minimum"));
-            String* max = (String*)(car->get_attribute_ref_al("Maximum"));
+            UD_String* min = (UD_String*)(car->get_attribute_ref_al("Minimum"));
+            UD_String* max = (UD_String*)(car->get_attribute_ref_al("Maximum"));
             
             cout << "Cardinality : ";
             cout << " min : " << *(min->getptr());
@@ -112,14 +112,14 @@ void RelationshipRecord::dump()
         }
     }
     
-    Map* entitySet = getTransformedEntitySet();
+    UD_Map* entitySet = getTransformedEntitySet();
     for(entitySet->begin();!entitySet->end();(*entitySet)++){
         Entity* tmpEntity = (Entity*)(entitySet->value());
         
         tmpEntity->dump();
     }
     
-    Map* relationshipSet = getTransformedRelationshipSet();
+    UD_Map* relationshipSet = getTransformedRelationshipSet();
     for(relationshipSet->begin();!relationshipSet->end();(*relationshipSet)++){
         Relationship* tmpRelationship = (Relationship*)(relationshipSet->value());
         
@@ -131,7 +131,7 @@ TransformedERD::TransformedERD(string erdName)
 {
     setERDName(erdName);
     
-    Map mapTmp;
+    UD_Map mapTmp;
     add_attribute_al("Entity_table", mapTmp);
     add_attribute_al("Relationship_table", mapTmp);
 }
@@ -142,10 +142,10 @@ TransformedERD::~TransformedERD()
 
 void TransformedERD::setERDName(string erdName)
 {
-    String tmp;
+    UD_String tmp;
     tmp.set_value(erdName);
     
-    universal_data* ptr = get_attribute_ref_al("ERD_name");
+    UD_universal_data* ptr = get_attribute_ref_al("ERD_name");
     if(ptr != NULL) {
         set_attribute_al("ERD_name", tmp);
     } else {
@@ -155,55 +155,55 @@ void TransformedERD::setERDName(string erdName)
 
 string TransformedERD::getERDName()
 {
-    universal_data *tmp = get_attribute_ref_al("ERD_name");
+    UD_universal_data *tmp = get_attribute_ref_al("ERD_name");
     
-    String* stringTmp = (String*)tmp;
+    UD_String* stringTmp = (UD_String*)tmp;
     
     return *(stringTmp->getptr());
 }
 
-Map* TransformedERD::getEntityTable()
+UD_Map* TransformedERD::getEntityTable()
 {
-    return (Map*)(get_attribute_ref_al("Entity_table"));
+    return (UD_Map*)(get_attribute_ref_al("Entity_table"));
 }
 
-Map* TransformedERD::getRelationshipTable()
+UD_Map* TransformedERD::getRelationshipTable()
 {
-    return (Map*)(get_attribute_ref_al("Relationship_table"));
+    return (UD_Map*)(get_attribute_ref_al("Relationship_table"));
 }
 
 void TransformedERD::addEntity(TransformedEntity* en)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(en->getEntityName());
-    Map* mapTmp = getEntityTable();
+    UD_Map* mapTmp = getEntityTable();
     
     mapTmp->insert(stringTmp, en);
 }
 
 void TransformedERD::removeEntity(string entityName)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(entityName);
-    Map* mapTmp = getEntityTable();
+    UD_Map* mapTmp = getEntityTable();
     
     mapTmp->erase(stringTmp);
 }
 
 void TransformedERD::addRelationship(TransformedRelationship* relationship)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(relationship->getRelationshipName());
-    Map* mapTmp = getRelationshipTable();
+    UD_Map* mapTmp = getRelationshipTable();
     
     mapTmp->insert(stringTmp, relationship);
 }
 
 void TransformedERD::removeRelationship(string relationshipName)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(relationshipName);
-    Map* mapTmp = getRelationshipTable();
+    UD_Map* mapTmp = getRelationshipTable();
     
     mapTmp->erase(stringTmp);
 }
@@ -211,9 +211,9 @@ void TransformedERD::removeRelationship(string relationshipName)
 
 TransformedEntity* TransformedERD::findEntity(string entityName)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(entityName);
-    Map* mapTmp = getEntityTable();
+    UD_Map* mapTmp = getEntityTable();
     
     mapTmp->find(stringTmp);
     
@@ -222,9 +222,9 @@ TransformedEntity* TransformedERD::findEntity(string entityName)
 
 TransformedRelationship* TransformedERD::findRelationship(string relationshipName)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(relationshipName);
-    Map* mapTmp = getRelationshipTable();
+    UD_Map* mapTmp = getRelationshipTable();
     
     mapTmp->find(stringTmp);
     
@@ -236,13 +236,13 @@ void TransformedERD::dump()
     cout << "Transformed ERD Name : " << getERDName() << endl;
     cout << "==Entity Table==" << endl;
     
-    Map* entityTable = getEntityTable();
+    UD_Map* entityTable = getEntityTable();
     for(entityTable->begin();!entityTable->end();(*entityTable)++){
         TransformedEntity* entity = (TransformedEntity*)(entityTable->value());
         entity->dump();
     }
     
-    Map* relationshipTable = getRelationshipTable();
+    UD_Map* relationshipTable = getRelationshipTable();
     for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
         TransformedRelationship* relationship = (TransformedRelationship*)(relationshipTable->value());
         relationship->dump();
@@ -251,7 +251,7 @@ void TransformedERD::dump()
 
 TransformedEntity::TransformedEntity()
 {
-    Attribute_List attributeListTmp;
+    UD_Attribute_List attributeListTmp;
     
     setEntityName("");
     add_attribute_al("Attribute_list", attributeListTmp);
@@ -260,7 +260,7 @@ TransformedEntity::TransformedEntity()
 
 TransformedEntity::TransformedEntity(string entityName)
 {
-    Attribute_List attributeListTmp;
+    UD_Attribute_List attributeListTmp;
     
     setEntityName(entityName);
     add_attribute_al("Attribute_list", attributeListTmp);
@@ -274,10 +274,10 @@ TransformedEntity::~TransformedEntity()
 
 void TransformedEntity::setEntityName(string entityName)
 {
-    String tmp;
+    UD_String tmp;
     tmp.set_value(entityName);
     
-    universal_data* ptr = get_attribute_ref_al("Entity_name");
+    UD_universal_data* ptr = get_attribute_ref_al("Entity_name");
     if(ptr != NULL) {
         set_attribute_al("Entity_name", tmp);
     } else {
@@ -287,49 +287,49 @@ void TransformedEntity::setEntityName(string entityName)
 
 string TransformedEntity::getEntityName()
 {
-    return *((String*)(get_attribute_ref_al("Entity_name")))->getptr();
+    return *((UD_String*)(get_attribute_ref_al("Entity_name")))->getptr();
 }
 
 void TransformedEntity::addAttribute(string attributeName,string attributeType)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(attributeType);
-    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    UD_Attribute_List* tmp = (UD_Attribute_List*)(get_attribute_ref_al("Attribute_list"));
     
     tmp->add_attribute_al(attributeName, stringTmp);
 }
 
-void TransformedEntity::addAttribute(Attribute_List tmpAttribute)
+void TransformedEntity::addAttribute(UD_Attribute_List tmpAttribute)
 {
-    universal_data tmp = tmpAttribute.get_attribute();
+    UD_universal_data tmp = tmpAttribute.get_attribute();
     for(tmpAttribute.begin();tmpAttribute.end();tmpAttribute++){
-        addAttribute(tmpAttribute.get_attribute_name(), *(((String*)(&tmp))->getptr()));
+        addAttribute(tmpAttribute.get_attribute_name(), *(((UD_String*)(&tmp))->getptr()));
     }
 }
 
 void TransformedEntity::removeAttribute(string attributeName)
 {
-    Attribute_List* tmp = (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    UD_Attribute_List* tmp = (UD_Attribute_List*)(get_attribute_ref_al("Attribute_list"));
     
     tmp->remove_attribute_al(attributeName);
 }
 
-Attribute_List* TransformedEntity::getAttributeList()
+UD_Attribute_List* TransformedEntity::getAttributeList()
 {
-    return (Attribute_List*)(get_attribute_ref_al("Attribute_list"));
+    return (UD_Attribute_List*)(get_attribute_ref_al("Attribute_list"));
 }
 
 //for 1:1 and default use
 void TransformedEntity::addLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al(linkName.getName(), linkName);
 }
 
 void TransformedEntity::removeLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->remove_attribute_al(linkName);
 }
@@ -337,7 +337,7 @@ void TransformedEntity::removeLink(Link linkName)
 //for 1:N, M:N use
 void TransformedEntity::addListLink(Link* linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al("List_"+linkName->getName(), *linkName);
 //    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
@@ -354,14 +354,14 @@ void TransformedEntity::addListLink(Link* linkName)
 
 void TransformedEntity::addHeadLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al("Head_"+linkName.getName(), linkName);
 }
 
 void TransformedEntity::addNextLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al("Next_"+linkName.getName(), linkName);
 }
@@ -371,29 +371,29 @@ void TransformedEntity::dump()
     cout << "==========" << endl;
     cout << "Entity Name : " << getEntityName() << endl;
     
-    Attribute_List* attList = getAttributeList();
+    UD_Attribute_List* attList = getAttributeList();
     for(attList->begin();!attList->end();(*attList)++){
-        universal_data name = attList->get_attribute_name_al();
-        universal_data type = attList->get_attribute_value_al();
-        cout << "name : " << *(((String*)(&name))->getptr())
-        << ", type : " << *(((String*)(&type))->getptr()) << endl;
+        UD_universal_data name = attList->get_attribute_name_al();
+        UD_universal_data type = attList->get_attribute_value_al();
+        cout << "name : " << *(((UD_String*)(&name))->getptr())
+        << ", type : " << *(((UD_String*)(&type))->getptr()) << endl;
     }
     cout << "==========" << endl;
     
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     for(linkSet->begin();!linkSet->end();(*linkSet)++){
 //        Link* linkTmp = (Link*)(linkSet->get_attribute_ref_al(linkSet->get_attribute_name_al()));
 //        cout << "link name : " << linkSet->get_attribute_name_al() << endl;
 //        cout << "Target name : " << linkTmp->getTargetName() << endl;
-        universal_data tmp = linkSet->get_attribute_name_al();
-        string linkName = *(((String*)(&tmp))->getptr());
+        UD_universal_data tmp = linkSet->get_attribute_name_al();
+        string linkName = *(((UD_String*)(&tmp))->getptr());
         cout << "link name : " << linkName << endl;
     }
 }
 
 TransformedRelationship::TransformedRelationship(string relationshipName)
 {
-    Attribute_List attributeListTmp;
+    UD_Attribute_List attributeListTmp;
     
     setRelationshipName(relationshipName);
     add_attribute_al("Link_set", attributeListTmp);
@@ -406,10 +406,10 @@ TransformedRelationship::~TransformedRelationship()
 
 void TransformedRelationship::setRelationshipName(string relationshipName)
 {
-    String stringTmp;
+    UD_String stringTmp;
     stringTmp.set_value(relationshipName);
     
-    universal_data* ptr = get_attribute_ref_al("Relationship_name");
+    UD_universal_data* ptr = get_attribute_ref_al("Relationship_name");
     
     if(ptr != NULL) {
         set_attribute_al("Relationship_name", stringTmp);
@@ -420,19 +420,19 @@ void TransformedRelationship::setRelationshipName(string relationshipName)
 
 string TransformedRelationship::getRelationshipName()
 {
-    return *(((String*)(get_attribute_ref_al("Relationship_name")))->getptr());
+    return *(((UD_String*)(get_attribute_ref_al("Relationship_name")))->getptr());
 }
 
 void TransformedRelationship::addLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al(linkName.getName(), linkName);
 }
 
 void TransformedRelationship::removeLink(Link linkName)
 {
-     Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+     UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->remove_attribute_al(linkName);
 }
@@ -440,7 +440,7 @@ void TransformedRelationship::removeLink(Link linkName)
 //for 1:N, M:N use
 void TransformedRelationship::addListLink(Link* linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     linkSet->add_attribute_al("List_"+linkName->getName(), *linkName);
 //    List* listLinkPtr = (List*)(linkSet->get_attribute_ref_al("List_"+linkName->getName()));
 //    
@@ -456,14 +456,14 @@ void TransformedRelationship::addListLink(Link* linkName)
 
 void TransformedRelationship::addHeadLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al("Head_"+linkName.getName(), linkName);
 }
 
 void TransformedRelationship::addNextLink(Link linkName)
 {
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     
     linkSet->add_attribute_al("Next_"+linkName.getName(), linkName);
 }
@@ -473,19 +473,19 @@ void TransformedRelationship::dump()
     cout << "==========" << endl;
     cout << "Relationship Name : " << getRelationshipName() << endl;
     
-    Attribute_List* linkSet = (Attribute_List*)(get_attribute_ref_al("Link_set"));
+    UD_Attribute_List* linkSet = (UD_Attribute_List*)(get_attribute_ref_al("Link_set"));
     for(linkSet->begin();!linkSet->end();(*linkSet)++){
 //        Link* linkTmp = (Link*)(linkSet->get_attribute_ref_al(linkSet->get_attribute_name_al()));
 //        cout << "link name : " << linkTmp->getName() << endl;
 //        cout << "Target name : " << linkTmp->getTargetName() << endl;
-        universal_data tmp = linkSet->get_attribute_name_al();
-        string linkName = *(((String*)(&tmp))->getptr());
+        UD_universal_data tmp = linkSet->get_attribute_name_al();
+        string linkName = *(((UD_String*)(&tmp))->getptr());
         cout << "link name : " << linkName << endl;
     }
 }
 
 Link::Link(){
-    String stringTmp;
+    UD_String stringTmp;
     
     stringTmp.set_value("");
     add_attribute_al("Name", stringTmp);
@@ -499,10 +499,10 @@ Link::Link(){
     stringTmp.set_value("");
     add_attribute_al("Taget_name", stringTmp);
     
-    Map mapTmp;
+    UD_Map mapTmp;
     add_attribute_al("Symbolic_link", mapTmp);
     
-    universal_data tmp;
+    UD_universal_data tmp;
     add_attribute_al("True_link", tmp);
 }
 
@@ -513,7 +513,7 @@ Link::~Link()
 
 void Link::setName(string name)
 {
-    String tmp;
+    UD_String tmp;
     
     tmp.set_value(name);
     set_attribute_al("Name", tmp);
@@ -521,12 +521,12 @@ void Link::setName(string name)
 
 string Link::getName()
 {
-    return *(((String*)get_attribute_ref_al("Name"))->getptr());
+    return *(((UD_String*)get_attribute_ref_al("Name"))->getptr());
 }
 
 void Link::setType(string type)
 {
-    String tmp;
+    UD_String tmp;
     
     tmp.set_value(type);
     set_attribute_al("Type", tmp);
@@ -534,12 +534,12 @@ void Link::setType(string type)
 
 string Link::getType()
 {
-    return *(((String*)get_attribute_ref_al("Type"))->getptr());
+    return *(((UD_String*)get_attribute_ref_al("Type"))->getptr());
 }
 
 void Link::setDirection(string direction)
 {
-    String tmp;
+    UD_String tmp;
     
     tmp.set_value(direction);
     set_attribute_al("Direction", tmp);
@@ -547,12 +547,12 @@ void Link::setDirection(string direction)
 
 string Link::getDirection()
 {
-    return *(((String*)get_attribute_ref_al("Direction"))->getptr());
+    return *(((UD_String*)get_attribute_ref_al("Direction"))->getptr());
 }
 
 void Link::setTargetName(string name)
 {
-    String tmp;
+    UD_String tmp;
     
     tmp.set_value(name);
     set_attribute_al("Taget_name", tmp);
@@ -560,30 +560,30 @@ void Link::setTargetName(string name)
 
 string Link::getTargetName()
 {
-    return *(((String*)get_attribute_ref_al("Taget_name"))->getptr());
+    return *(((UD_String*)get_attribute_ref_al("Taget_name"))->getptr());
 }
 
-void Link::setTrueLink(universal_data utmp)
+void Link::setTrueLink(UD_universal_data utmp)
 {
     set_attribute_al("True_link", utmp);
 }
 
-universal_data* Link::getTrueLink()
+UD_universal_data* Link::getTrueLink()
 {
     return get_attribute_ref_al("True_link");
 }
 
-Map* transferToBinary(ERD* erd)
+UD_Map* transferToBinary(ERD* erd)
 {
-    Map* relationshipTable = erd->getRelationshipTable();
-    Map* record = new Map();
+    UD_Map* relationshipTable = erd->getRelationshipTable();
+    UD_Map* record = new UD_Map();
 
     for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
         Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
-        Attribute_List* roleList = relationshipPtr->getRoleList();
+        UD_Attribute_List* roleList = relationshipPtr->getRoleList();
         
         if(roleList->size() > 2){
-            String tmpStrnig;
+            UD_String tmpStrnig;
             //transfer Relationship to Entity
             string relationshipName = relationshipPtr->getRelationshipName();
             Entity* tmpEnity = new Entity("ENTITY_"+relationshipName);
@@ -615,19 +615,19 @@ Map* transferToBinary(ERD* erd)
                 newRole2->setEntityName(tmpEnity->getEntityName());
                 
                 //set new Role cardinality
-                Attribute_List* attTmp = (Attribute_List*)(rolePtr->get_attribute_ref_al("Cardinality"));
+                UD_Attribute_List* attTmp = (UD_Attribute_List*)(rolePtr->get_attribute_ref_al("Cardinality"));
                 
                 newRole1->add_attribute_al("Cardinality", *attTmp);
                 newRole2->add_attribute_al("Cardinality", *attTmp);
                 
                 //set new Role navigation
-                string navigation = *(((String*)(rolePtr->get_attribute_ref_al("Navigation")))->getptr());
+                string navigation = *(((UD_String*)(rolePtr->get_attribute_ref_al("Navigation")))->getptr());
                 
-                String toEntity;
+                UD_String toEntity;
                 toEntity.set_value("to_entity");
-                String toRelationship;
+                UD_String toRelationship;
                 toRelationship.set_value("to_relationship");
-                String bidirectional;
+                UD_String bidirectional;
                 bidirectional.set_value("bidirectional");
                 
                 if(navigation == "to_entity"){
@@ -660,24 +660,24 @@ Map* transferToBinary(ERD* erd)
     }
     //remove original Relationship
     for(record->begin();!record->end();(*record)++){
-        universal_data tmp = record->key();
+        UD_universal_data tmp = record->key();
 //        cout << *(((String*)&(tmp))->getptr()) << endl;
-        erd->removeRelationship(*(((String*)&(tmp))->getptr()));
+        erd->removeRelationship(*(((UD_String*)&(tmp))->getptr()));
     }
     
     return record;
 }
 
-Map* importDirectionDegeneration()
+UD_Map* importDirectionDegeneration(string dirDegenerationScript)
 {
-    ifstream dirDegenerationInput("./decision/direction_degeneration.txt");
-    Map* mapTmp = new Map();
+    ifstream dirDegenerationInput(dirDegenerationScript);
+    UD_Map* mapTmp = new UD_Map();
     
     string roleName, to_entity, to_relationship, directionName;
     
     while(dirDegenerationInput >> roleName){
-        Attribute_List* attTmp = new Attribute_List();
-        String stringTmp;
+        UD_Attribute_List* attTmp = new UD_Attribute_List();
+        UD_String stringTmp;
 
         dirDegenerationInput >> directionName;
         dirDegenerationInput >> to_entity;
@@ -696,29 +696,29 @@ Map* importDirectionDegeneration()
     return mapTmp;
 }
 
-void directionDegeneration(ERD* erd)
+void directionDegeneration(ERD* erd, string dirDegenerationScript)
 {
-    Map* dirDegeneration = importDirectionDegeneration();
-    Map* relationshipTable = (Map*)(erd->get_attribute_ref_al("Relationship_table"));
+    UD_Map* dirDegeneration = importDirectionDegeneration(dirDegenerationScript);
+    UD_Map* relationshipTable = (UD_Map*)(erd->get_attribute_ref_al("Relationship_table"));
     
     //foreach direction degeneration
     for(dirDegeneration->begin();!dirDegeneration->end();(*dirDegeneration)++){
-        universal_data tmp = dirDegeneration->key();
-        string roleName = *(((String*)(&tmp))->getptr());
-        Attribute_List* attTmp = (Attribute_List*)(dirDegeneration->value());
+        UD_universal_data tmp = dirDegeneration->key();
+        string roleName = *(((UD_String*)(&tmp))->getptr());
+        UD_Attribute_List* attTmp = (UD_Attribute_List*)(dirDegeneration->value());
         //foreach relationship
         for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
             Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
-            Attribute_List* roleList = relationshipPtr->getRoleList();
+            UD_Attribute_List* roleList = relationshipPtr->getRoleList();
             for(roleList->begin();!roleList->end();(*roleList)++){
                 Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
                 if(roleName == role->getRoleName()){
-                    String* navigationPtr = (String*)(role->get_attribute_ref_al("Navigation"));
+                    UD_String* navigationPtr = (UD_String*)(role->get_attribute_ref_al("Navigation"));
                     string navigation = *(navigationPtr->getptr());
-                    String stringTmp;
+                    UD_String stringTmp;
                     
-                    string toEntity = *(((String*)(attTmp->get_attribute_ref_al("to_entity")))->getptr());
-                    string toRelationship = *(((String*)(attTmp->get_attribute_ref_al("to_relationship")))->getptr());
+                    string toEntity = *(((UD_String*)(attTmp->get_attribute_ref_al("to_entity")))->getptr());
+                    string toRelationship = *(((UD_String*)(attTmp->get_attribute_ref_al("to_relationship")))->getptr());
                     
                     if(navigation == "to_entity"){
                         if(toEntity == "1"){
@@ -754,16 +754,16 @@ void directionDegeneration(ERD* erd)
     }
 }
 
-Map* importEmbedding()
+UD_Map* importEmbedding(string embeddingScript)
 {
-    ifstream embeddingInput("./decision/embedding.txt");
-    Map* mapTmp = new Map();
+    ifstream embeddingInput(embeddingScript);
+    UD_Map* mapTmp = new UD_Map();
     
     string relationshipName, embed;
     
     while(embeddingInput >> relationshipName){
-        String stringTmp;
-        String* stringPtr = new String();
+        UD_String stringTmp;
+        UD_String* stringPtr = new UD_String();
         
         stringTmp.set_value(relationshipName);
         
@@ -778,23 +778,23 @@ Map* importEmbedding()
 
 void duplicate(ERD* erd, TransformedERD* transERD)
 {
-    Map* entityTable = erd->getEntityTable();
-    Map* relationshipTable = erd->getRelationshipTable();
+    UD_Map* entityTable = erd->getEntityTable();
+    UD_Map* relationshipTable = erd->getRelationshipTable();
     
-    Map* transEntityTable = transERD->getEntityTable();
-    Map* transRelationshipTable = transERD->getRelationshipTable();
+    UD_Map* transEntityTable = transERD->getEntityTable();
+    UD_Map* transRelationshipTable = transERD->getRelationshipTable();
     
     for(entityTable->begin();!entityTable->end();(*entityTable)++){
         Entity* entityPtr = (Entity*)(entityTable->value());
         string entityName = entityPtr->getEntityName();
         TransformedEntity* transEntity = new TransformedEntity(entityName);
         
-        Attribute_List* attList = entityPtr->getAttributeList();
+        UD_Attribute_List* attList = entityPtr->getAttributeList();
         for(attList->begin();!attList->end();(*attList)++){
-            universal_data name = attList->get_attribute_name_al();
-            universal_data type = attList->get_attribute_value_al();
+            UD_universal_data name = attList->get_attribute_name_al();
+            UD_universal_data type = attList->get_attribute_value_al();
             
-            transEntity->addAttribute(*(((String*)(&name))->getptr()), *(((String*)(&type))->getptr()));
+            transEntity->addAttribute(*(((UD_String*)(&name))->getptr()), *(((UD_String*)(&type))->getptr()));
         }
         transEntityTable->insert(entityTable->key(), transEntity);
     }
@@ -808,48 +808,50 @@ void duplicate(ERD* erd, TransformedERD* transERD)
     }
 }
 
-void embedding(ERD* erd, TransformedERD* transERD)
+TransformedERD* embedding(ERD* erd, string embeddingScript)
 {
-    Map* embeddingInfo = importEmbedding();
-    Map* relationshipTable = erd->getRelationshipTable();
+    UD_Map* embeddingInfo = importEmbedding(embeddingScript);
+    UD_Map* relationshipTable = erd->getRelationshipTable();
+    
+    TransformedERD* transERD = new TransformedERD("tmp");
     
     //copy original ERD to transformed ERD
     duplicate(erd, transERD);
-    Map* transEntityTable = transERD->getEntityTable();
-    Map* transRelationshipTable = transERD->getRelationshipTable();
+    UD_Map* transEntityTable = transERD->getEntityTable();
+    UD_Map* transRelationshipTable = transERD->getRelationshipTable();
 
     //foreach relationship
     for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
         Relationship* relationshipPtr = (Relationship*)(relationshipTable->value());
         string relationshipName = relationshipPtr->getRelationshipName();
-        Attribute_List* roleList = relationshipPtr->getRoleList();
+        UD_Attribute_List* roleList = relationshipPtr->getRoleList();
         
         string navigation[2], min[2], max[2], entityName[2];
         int i = 0;
         for(roleList->begin();!roleList->end();(*roleList)++){
             Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
-            Attribute_List* car = (Attribute_List*)(role->get_attribute_ref_al("Cardinality"));
-            String* navigationTmp = (String*)(role->get_attribute_ref_al("Navigation"));
+            UD_Attribute_List* car = (UD_Attribute_List*)(role->get_attribute_ref_al("Cardinality"));
+            UD_String* navigationTmp = (UD_String*)(role->get_attribute_ref_al("Navigation"));
             
             entityName[i] = role->getEntityName();
             
             navigation[i] = *(navigationTmp->getptr());
             
-            min[i] = *(((String*)(car->get_attribute_ref_al("Minimum")))->getptr());
-            max[i] = *(((String*)(car->get_attribute_ref_al("Maximum")))->getptr());
+            min[i] = *(((UD_String*)(car->get_attribute_ref_al("Minimum")))->getptr());
+            max[i] = *(((UD_String*)(car->get_attribute_ref_al("Maximum")))->getptr());
             
             i++;
         }
         //foreach embedding information
         string decision;
         for(embeddingInfo->begin();!embeddingInfo->end();(*embeddingInfo)++){
-            universal_data tmp = embeddingInfo->key();
-            if(relationshipName == *(((String*)(&tmp))->getptr())){
-                decision = *(((String*)(embeddingInfo->value()))->getptr());
+            UD_universal_data tmp = embeddingInfo->key();
+            if(relationshipName == *(((UD_String*)(&tmp))->getptr())){
+                decision = *(((UD_String*)(embeddingInfo->value()))->getptr());
             }
         
         
-            String relationshipNameTmp;
+            UD_String relationshipNameTmp;
             relationshipNameTmp.set_value(relationshipName);
             TransformedRelationship* transRelationshipPtr
                 = (TransformedRelationship*)(transRelationshipTable->find(relationshipNameTmp));
@@ -860,7 +862,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                     int targetIndex;
                     if(index == 0) targetIndex = 1;
                     else targetIndex = 0;
-                    String entityNameTmp;
+                    UD_String entityNameTmp;
                     entityNameTmp.set_value(entityName[index]);
                     
                     TransformedEntity* transEntityPtr
@@ -915,7 +917,7 @@ void embedding(ERD* erd, TransformedERD* transERD)
                 }
             }
             
-            String entityNameTmp;
+            UD_String entityNameTmp;
             //E1
             entityNameTmp.set_value(entityName[0]);
             TransformedEntity* transEntityPtr1
@@ -1195,4 +1197,6 @@ void embedding(ERD* erd, TransformedERD* transERD)
             }
         }
     }
+    
+    return transERD;
 }

@@ -1,53 +1,6 @@
 #include "output_generation.h"
 
-void outputRealCode(node* ptree)
-{
-    general_output_generation gog("data_model_lib/physical_model_cpp_language/node_print_rule_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/global_print_table_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/interleave_vector_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/enclose_vector_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/file_root_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/indent_control_table_file.txt",
-                                  "data_model_lib/physical_model_cpp_language/condition_function_table_file.txt") ;
-
-    initialized_precedence_table("data_model_lib/physical_model_cpp_language/precedence_file.txt") ;
-
-    string filename = "data_model_lib/physical_model_cpp_language/node_print_function_file.txt" ;
-    ifstream infile(filename.c_str());
-    if(!infile)
-    {
-        cout<<"open file fail "<<filename<<endl;
-        exit(-1) ;
-    }
-    
-    string construct_name;
-    string tmp1, tmp2;
-    while(infile>>construct_name )
-    {
-        infile>>tmp1 ;
-        infile>>tmp2 ;
-        if (tmp1 != "default" || tmp2 != "default")
-        {
-            cout<<"different than default"<<endl ;
-            exit(-1) ;
-        }
-        gog.set_node_print_function(construct_name, print_node_info_func, print_node_info_func);
-    }
-    gog.set_condition_fptr("less_than", less_than);
-    
-    gog.output_generation(ptree);
-    
-    gog.output_file(true);
-}
-
-general_output_generation::general_output_generation(
-     std::string node_print_rule_file,
-     std::string global_print_table_file,
-     std::string interleave_vector_file,
-     std::string enclose_vector_file,
-     std::string file_root_file,
-     std::string indent_control_table_file,
-     std::string condition_function_table_file)
+general_output_generation::general_output_generation(std::string node_print_rule_file, std::string global_print_table_file, std::string interleave_vector_file, std::string enclose_vector_file, std::string file_root_file, std::string indent_control_table_file, std::string condition_function_table_file)
 {
 	this->initialized_node_print_rule(node_print_rule_file) ;
 	this->initialized_global_print_table(global_print_table_file) ;
@@ -505,6 +458,12 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 	if(indent_iter != indent_control_table.end())
 	{
 		indent_counter = indent_counter + indent_iter->second.indent_num ;
+//		int i  = 0; 
+//		while(i<indent_counter)
+//		{
+//			stream_iter->second = stream_iter->second + " " ;
+//			i++ ;
+//		}
 	}
 
 	// print current node 
@@ -529,13 +488,13 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 	if(nest_print_flag != 'P')
 	{
 //		if(nodeptr->get_branches_size() != 0)
-        if(print_flag)
-            if(enclose_iter != enclose_vector.end())
-                if(enclose_iter->second.first!="")
-                    stream_iter->second = stream_iter->second + enclose_iter->second.first +"" ;
+		if(nodeptr->get_t_nt_flag() != 't')
+			if(print_flag)
+				if(enclose_iter != enclose_vector.end())
+					if(enclose_iter->second.first!="")
+						stream_iter->second = stream_iter->second + enclose_iter->second.first +" " ; 
 
-		if(indent_iter != indent_control_table.end()
-           && nodeptr->get_construct_name() != "class_content")
+		if(indent_iter != indent_control_table.end())
 		{
 			if(indent_iter->second.newline) // newline 
 				stream_iter->second = stream_iter->second + "\n" ;
@@ -546,35 +505,24 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 				i++ ;
 			}
 		}
-
 		for(int i = 0 ; i < (int)(nodeptr->node_branch_size()) ; i++)
-        {
-			if (i >=(int)interleave_iter->second.size()-1 && i != (int)(nodeptr->node_branch_size())-1)
+		{
+			if ( i >= (int) interleave_iter->second.size()) 
 			{
-				if(interleave_iter->second[interleave_iter->second.size()-2] == "")
-					stream_iter->second = stream_iter->second + interleave_iter->second[interleave_iter->second.size()-2] ;
+				int j = interleave_iter->second.size() -2 ;
+
+				if(interleave_iter->second[j] == "")
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] ;
 				else
-					stream_iter->second = stream_iter->second + interleave_iter->second[interleave_iter->second.size()-2] + " " ;
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] + " " ;
 			}
-			else if (i >=(int)interleave_iter->second.size())
-			{
-				if(interleave_iter->second[interleave_iter->second.size()-2] == "")
-					stream_iter->second = stream_iter->second + interleave_iter->second[interleave_iter->second.size()-2] ;
-				else
-					stream_iter->second = stream_iter->second + interleave_iter->second[interleave_iter->second.size()-2] + " " ;
-			}
-			else 
+			else
 			{
 				if(interleave_iter->second[i] == "")
 					stream_iter->second = stream_iter->second + interleave_iter->second[i] ;
 				else
 					stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
 			}
-            //for public in class_content
-            if(i == 0 && nodeptr->get_construct_name() == "class_content"){
-                stream_iter->second = stream_iter->second + "\n" + "public:";
-            }
-            
 			if(i>0)
 			{
 				if(indent_iter != indent_control_table.end())
@@ -621,10 +569,11 @@ void general_output_generation::traverse_preorder(node *nodeptr)
 		}
 
 //		if(nodeptr->get_branches_size() != 0)
+		if(nodeptr->get_t_nt_flag() != 't')
 			if(print_flag)
 				if(enclose_iter != enclose_vector.end())
 					if(enclose_iter->second.first!="")
-						stream_iter->second = stream_iter->second + enclose_iter->second.second +" " ;
+						stream_iter->second = stream_iter->second + enclose_iter->second.second +" " ; 
 	}
 	else 
 	{
@@ -705,10 +654,22 @@ void general_output_generation::traverse_postorder(node *nodeptr)
 	{
 		for(int i = 0 ; i < (int)( nodeptr->node_branch_size()) ; i++)
 		{
-			if(interleave_iter->second[i] == "")
-				stream_iter->second = stream_iter->second + interleave_iter->second[i] ;
+			if ( i >= (int) interleave_iter->second.size()) 
+			{
+				int j = interleave_iter->second.size() -2 ;
+
+				if(interleave_iter->second[j] == "")
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] ;
+				else
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] + " " ;
+			}
 			else
-				stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
+			{
+				if(interleave_iter->second[i] == "")
+					stream_iter->second = stream_iter->second + interleave_iter->second[i] ;
+				else
+					stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
+			}
 			output_generation( (node*)(nodeptr->get_node_branch(i))) ;
 		}
 		if( nodeptr->node_branch_size() != 0) 
@@ -832,11 +793,26 @@ void general_output_generation::traverse_inorder(node *nodeptr)
 	{
 		for(int i = 0 ; i < (int)(nodeptr->node_branch_size()) ; i++)
 		{
-			if(interleave_iter->second[i] == "")
-				stream_iter->second = stream_iter->second + interleave_iter->second[i] ;
+			if ( i >= (int) interleave_iter->second.size()) 
+			{
+				int j = interleave_iter->second.size() -2 ;
+
+				if(interleave_iter->second[j] == "")
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] ;
+				else
+					stream_iter->second = stream_iter->second + interleave_iter->second[j] + " " ;
+			}
 			else
-				stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
+			{
+				if(interleave_iter->second[i] == "")
+					stream_iter->second = stream_iter->second + interleave_iter->second[i] ;
+				else
+					stream_iter->second = stream_iter->second + interleave_iter->second[i] + " " ;
+			}
+
 			output_generation( (node*)(nodeptr->get_node_branch(i))) ;
+
+
 			if(i < (int)(nodeptr->node_branch_size()-1))
 			{
 				// print current node 
@@ -979,7 +955,7 @@ void general_output_generation::output_file(bool single_file)
 		iter = stream_table.begin() ;
 		if(iter == stream_table.end())
 			return ;
-		filename = "output.cpp" ;
+		filename = iter->first+".txt" ;
 		outfile.open( filename.c_str()) ;
 		if(!outfile)
 		{
@@ -1032,40 +1008,40 @@ void general_output_generation::output_file(char* filename)
 }
 
 // free function 
-void print_universal_data(string& stream, universal_data ud)
+void print_universal_data(string& stream, UD_universal_data ud)
 {
 	if(ud.get_type_tag() == T_int)
 	{
 		stringstream ss ;
-		ss<<*(((Int*)(&ud))->getptr()) ;
+		ss<<*(((UD_Int*)(&ud))->getptr()) ;
 		string tmp ;
 		ss>>tmp  ;
 //		char* tmp = new char[20] ;
-//		sprintf(tmp, "%d", *(((Int*)(&ud))->getptr())) ;
+//		sprintf(tmp, "%d", *(((UD_Int*)(&ud))->getptr())) ;
 		stream = stream+tmp+" " ;
 	}
 	else if (ud.get_type_tag() == T_char)
-		stream = stream +  *(((Char*)(&ud))->getptr()) + " " ;
+		stream = stream +  *(((UD_Char*)(&ud))->getptr()) + " " ;
 	else if (ud.get_type_tag() == T_string)
-		stream = stream + *(((String*)(&ud))->getptr()) + " " ;
+		stream = stream + *(((UD_String*)(&ud))->getptr()) + " " ;
 	else if (ud.get_type_tag() == T_float)
 	{
 		stringstream ss ;
-		ss<<*(((Float*)(&ud))->getptr()) ;
+		ss<<*(((UD_Float*)(&ud))->getptr()) ;
 		string tmp ;
 		ss>>tmp  ;
 //		char* tmp = new char[20] ;
-//		sprintf(tmp, "%f", *(((Float*)(&ud))->getptr())) ;
+//		sprintf(tmp, "%f", *(((UD_Float*)(&ud))->getptr())) ;
 		stream = stream+tmp+" " ;
 	}
 	else if (ud.get_type_tag() == T_double)
 	{
 		stringstream ss ;
-		ss<<*(((Double*)(&ud))->getptr()) ;
+		ss<<*(((UD_Double*)(&ud))->getptr()) ;
 		string tmp ;
 		ss>>tmp  ;
 //		char* tmp = new char[20] ;
-//		sprintf(tmp, "%d", *(((Double*)(&ud))->getptr())) ;
+//		sprintf(tmp, "%d", *(((UD_Double*)(&ud))->getptr())) ;
 		stream = stream+tmp+" " ;
 	}
 	else 
@@ -1085,12 +1061,12 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 	}
 	else if (elem.kind == Attr_Name)
 	{
-		universal_data tmp = nodeptr->get_node_attribute( elem.name) ;
-//		if(tmp.get_type_tag() == T_unknown) 
-//		{
-//			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
-//			exit(-1) ;
-//		}
+		UD_universal_data tmp = nodeptr->get_node_attribute( elem.name) ;
+		if(tmp.get_type_tag() == T_unknown) 
+		{
+			cout<<"this attribute "<<elem.name<<" is not existed"<<endl ;
+			exit(-1) ;
+		}
 		if(enclose.first!="")
 			stream = stream + enclose.first + " " ;
 		if(elem.attr_name_flag)
@@ -1106,6 +1082,23 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 	}
 	else // all attribute 
 	{
+		UD_Attribute_List all_attr = nodeptr->get_all_node_attribute() ;
+		all_attr.begin() ;
+		while(!all_attr.end())
+		{
+			if(enclose.first!="")
+				stream = stream + enclose.first + " " ;
+			if(elem.attr_name_flag)
+				print_universal_data(stream, all_attr.get_attribute_name_al() ) ;
+			print_universal_data(stream, all_attr.get_attribute_value_al()) ;
+			if(enclose.second!="")
+				stream = stream + enclose.second + " " ;
+			all_attr++ ;
+			if(!all_attr.end())
+				stream = stream + ", " ;
+		}
+
+/*
 		Associate_List_Iterator* aiter = (Associate_List_Iterator*)(nodeptr->get_node_attribute_iter()) ;
 		aiter->begin() ;
 		while(!aiter->end())
@@ -1121,6 +1114,7 @@ void print_node_info_func(string& stream, node* nodeptr, general_output_generati
 			if(!aiter->end())
 				stream = stream + ", " ;
 		}
+*/
 	}
 }
 
@@ -1208,7 +1202,7 @@ bool less_than(node*nodeptr)
 		return false ;
 	// check whether parent ptr is binary operator or unary operator 
 	string parent_kind, child_kind ;
-	universal_data elem1 = parent_ptr->get_node_attribute("binary_op") ;
+	UD_universal_data elem1 = parent_ptr->get_node_attribute("binary_op") ;
 	parent_kind = "binary_op" ;
 	if(elem1.get_type_tag() == T_unknown){
 		elem1 = parent_ptr->get_node_attribute("unary_op") ;
@@ -1219,7 +1213,7 @@ bool less_than(node*nodeptr)
 	if(parent_kind == "unary_op")
 		return true ;
 
-	universal_data elem2 = nodeptr->get_node_attribute("binary_op") ;
+	UD_universal_data elem2 = nodeptr->get_node_attribute("binary_op") ;
 	child_kind = "binary_op" ;
 	if(elem2.get_type_tag() == T_unknown){
 		elem2 = nodeptr->get_node_attribute("unary_op") ;
@@ -1236,9 +1230,9 @@ bool less_than(node*nodeptr)
 	list<precedence_elem>::iterator liter ;
 
 	parent_tmp.type = parent_kind ;
-	parent_tmp.elem = *(((String*)(&elem1))->getptr()) ;
+	parent_tmp.elem = *(((UD_String*)(&elem1))->getptr()) ;
 	child_tmp.type = child_kind ;
-	child_tmp.elem = *(((String*)(&elem2))->getptr()) ;
+	child_tmp.elem = *(((UD_String*)(&elem2))->getptr()) ;
 
 	for(iter = precedence_table.begin(); iter != precedence_table.end() ; iter++)
 	{

@@ -20,6 +20,7 @@ statement 			$	$
 assignment_statement		$	$
 branch_statement		$	$ 
 for_loop			$	$ 
+while_loop			$	$ 
 function_call			$	$ 
 return_process			$	$ 
 element				$	$

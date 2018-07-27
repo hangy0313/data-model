@@ -32,8 +32,6 @@ struct info_elem
 
 class general_output_generation ;
 
-void outputRealCode(node* ptree);
-
 // free function 
 void print_node_info_func(string& stream, node* nodeptr, general_output_generation* gog) ; 
 

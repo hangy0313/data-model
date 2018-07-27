@@ -20,6 +20,7 @@ statement 					T	pre
 assignment_statement				T	in
 branch_statement				T	pre 
 for_loop					T	pre
+while_loop					T	pre
 function_call					T	pre
 return_process					T	pre
 element						T	pre

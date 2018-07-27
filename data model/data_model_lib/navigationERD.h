@@ -11,12 +11,12 @@ using namespace std;
 /*
  *  import navigation info
  */
-Attribute_List* importNavigationInfo();
+UD_Attribute_List* importNavigationInfo(string naviScript);
 
 /*
  *  Role add data member : Navigation => "to_entity", "to_relationship", "bidirectional"
  */
-void addNavigationToERD(ERD* erd);
+void addNavigationToERD(ERD* erd, string naviScript);
 
 /*
  *  Dump ERD info after add navigation

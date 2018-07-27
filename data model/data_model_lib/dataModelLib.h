@@ -7,7 +7,6 @@
 #include "transformedERD.h"
 #include "physicalERD.h"
 #include "parseERD.h"
-#include "accessModel.h"
 
 #include "originalERD.cpp"
 #include "cardinalityERD.cpp"
@@ -15,6 +14,5 @@
 #include "transformedERD.cpp"
 #include "physicalERD.cpp"
 #include "parseERD.cpp"
-#include "accessModel.cpp"
 
 #endif

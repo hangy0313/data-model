@@ -10,117 +10,83 @@
 #include <fstream>
 #include "./data_model_lib/dataModelLib.h"
 #include "./output_generation_lib/output_generation_lib.h"
+//#include "./data_model_lib/controlFlow.h"
+//#include "./data_model_lib/controlFlow.cpp"
+
 
 using namespace std;
 
-void show_universal_data(universal_data ud)
-{
-    if(ud.get_type_tag() == T_int)
-        cout<< *(((Int*)(&ud))->getptr()) ;
-    else if (ud.get_type_tag() == T_char)
-        cout<< *(((Char*)(&ud))->getptr()) ;
-    else if (ud.get_type_tag() == T_string)
-        cout<< *(((String*)(&ud))->getptr()) ;
-    else if (ud.get_type_tag() == T_float)
-        cout<< *(((Float*)(&ud))->getptr()) ;
-    else if (ud.get_type_tag() == T_double)
-        cout<< *(((Double*)(&ud))->getptr()) ;
-    else 
-        cout<<"unknown" ;
-}
-
-void print_parse_tree_mini(node* nodeptr)
-{
-    if( nodeptr == NULL)
-    {
-        cout<<"node:: empty subrule"<<endl ;
-        return ;
-    }
-    cout<<"node construct_name: "<< nodeptr->get_construct_name()<<endl ;
-    cout<<"attribute: "<<endl ;
-    Associate_List_Iterator* aiter = (Associate_List_Iterator*)(nodeptr->get_node_attribute_iter()) ;
-    for(aiter->begin() ; !aiter->end(); aiter->advance())
-    {
-        if(aiter->first() != "NoName")
-        {
-            cout<<"attr: "<<aiter->first()<<endl ;
-            cout<<"value: "; show_universal_data(aiter->second()) ;
-            cout<<endl ;
-        }
-    }
-    cout<<endl ;
-    
-    cout<<"binding: "<<endl ;
-    for(nodeptr->binding_info_begin() ; !nodeptr->binding_info_end() ; nodeptr->binding_info_advance())
-        cout<<"kind: "<<nodeptr->binding_info_kind()<<"name: "<<nodeptr->binding_info_name()<<endl ;
-    
-    cout<<"child: {// "<<endl ;
-    
-    Virtual_Iterator* biter = nodeptr->get_node_branch_iter() ;
-    for(biter->begin() ; !biter->end() ; biter->advance())
-    {
-        node* tmp = (node*)(*(*biter)) ;
-        print_parse_tree_mini( tmp ) ;
-    }
-    
-    cout<<" //}"<<endl ;
-}
-
 int main()
 {
-    //    /*
-    //     *  test importCardinalityInfo()
-    //     */
-    //    list<cardinalityRole> tmpRoleList = importCardinalityInfo();
-    //    list<cardinalityRole>::iterator iter;
-    //
-    //    for(iter = tmpRoleList.begin();iter != tmpRoleList.end();iter++){
-    //        cout << (*iter).getRoleName() << endl;
-    //        cout << (*iter).getCardinality().minNum << endl;
-    //        cout << (*iter).getCardinality().maxNum << endl;
-    //    }
-    ERD* tmpERD = new ERD("test");
-    TransformedERD* trnasERD = new TransformedERD(tmpERD->getERDName());
-    Map* record = new Map();
-    Map* physicalERDMap = new Map();
-//test 1:1 binary
-    Entity* e1 = new Entity("Customer");
-    
-    Entity* e2 = new Entity("Product");
-    
+    ERD* tmpERD = import("./erdScript/erd.txt");
+    tmpERD->dump();
 
-    
-    Relationship* r1 = new Relationship("Order");
-    r1->addRole("Cus", "Customer");
-    r1->addRole("Pro", "Product");
-
-    
-    tmpERD->addEntity(e1);
-    tmpERD->addEntity(e2);
-    tmpERD->addRelationship(r1);
-    
-    
-//    tmpERD->dump();
-    
-    addCardinalityToERD(tmpERD);
+    addCardinalityToERD(tmpERD, "./erdScript/cardinality.txt");
 //    dumpCardinalityERD(tmpERD);
 
-    addNavigationToERD(tmpERD);
-//    dumpNavigationERD(tmpERD);
-    
-    record = transferToBinary(tmpERD);
-
-    directionDegeneration(tmpERD);
+    addNavigationToERD(tmpERD, "./erdScript/navigation.txt");
 //    dumpNavigationERD(tmpERD);
 
-    embedding(tmpERD, trnasERD);
-//    trnasERD->dump();
-//
-    tansToPhysicalModel(trnasERD, physicalERDMap);
-    
+    UD_Map* record = transferToBinary(tmpERD);
+
+    directionDegeneration(tmpERD, "./decision/direction_degeneration.txt");
+//    dumpNavigationERD(tmpERD);
+
+    TransformedERD* transERD = embedding(tmpERD, "./decision/embedding.txt");
+//    transERD->dump();
+
+    UD_Map* physicalERDMap = tansToPhysicalModel(transERD);
+
     node* ptree = transToParseTree(physicalERDMap);
     
-    outputRealCode(ptree);
+    //output real code
+    general_output_generation gog("data_model_lib/physical_model_cpp_language/node_print_rule_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/global_print_table_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/interleave_vector_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/enclose_vector_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/file_root_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/indent_control_table_file.txt",
+                                  "data_model_lib/physical_model_cpp_language/condition_function_table_file.txt") ;
+    
+    initialized_precedence_table("data_model_lib/physical_model_cpp_language/precedence_file.txt") ;
+    
+    string filename = "data_model_lib/physical_model_cpp_language/node_print_function_file.txt" ;
+    ifstream infile(filename.c_str());
+    if(!infile)
+    {
+        cout<<"open file fail "<<filename<<endl;
+        exit(-1) ;
+    }
+    
+    string construct_name;
+    string tmp1, tmp2;
+    while(infile>>construct_name )
+    {
+        infile>>tmp1 ;
+        infile>>tmp2 ;
+        if (tmp1 != "default" || tmp2 != "default")
+        {
+            cout<<"different than default"<<endl ;
+            exit(-1) ;
+        }
+        gog.set_node_print_function(construct_name, print_node_info_func, print_node_info_func);
+    }
+    gog.set_condition_fptr("less_than", less_than);
+    
+    gog.output_generation(ptree);
+    
+    gog.output_file(true);
+//
+//    outputRealCode(ptree);
+    
+//    
+//    node* ctree = createParseTree(cfm);
+//    initialPatternTable();
+//
+//    control_flow_model* cfb = new control_flow_model();
+//    importControlModel(cfb);
+//    node* root = createParseTree(cfb);
+//    outputRealCode(root);
     
     return 0;
 }

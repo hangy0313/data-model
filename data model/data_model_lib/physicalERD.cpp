@@ -404,3 +404,26 @@ list<memberFunctionSchema> physicalERD::getAllMemberFunction()
 {
     return memberFunctionList;
 }
+
+void outputFunctionList(UD_Map* physicalERDMap, string functionList)
+{
+    ofstream funcTable(functionList.c_str());
+    int count = 1;
+    
+    for(physicalERDMap->begin();!physicalERDMap->end();(*physicalERDMap)++){
+        physicalERD* classPtr = (physicalERD*)(physicalERDMap->value());
+        
+        string className = classPtr->getClassName();
+        
+        list<memberFunctionSchema> funcList = classPtr->getAllMemberFunction();
+        list<memberFunctionSchema>::iterator funcIter;
+        for(funcIter = funcList.begin();funcIter != funcList.end();funcIter++){
+            string functionName = (*funcIter).functionName;
+            
+            funcTable << className << "_function_" << count << " " << functionName << endl;
+            
+            count++;
+        }
+        count = 1;
+    }
+}

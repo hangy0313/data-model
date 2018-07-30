@@ -6,7 +6,7 @@ data_member_sequence		$	$
 data_member			$	$ 
 member_function_sequence	$	$
 member_function			$	$
-parameter_list			(	) 
+parameter_list			$	$ 
 par				$	$ 
 body				{	} 
 macros				$	$ 

@@ -146,4 +146,8 @@ UD_Map* importEmbedding(string embeddingScript);
 void duplicate(ERD* erd, TransformedERD* transERD);
 TransformedERD* embedding(ERD* erd, string embeddingScript);
 
+//create specialized erd info for data access model
+void speicalizedERD(ERD* erd, string embeddingScript, string infoName);
+void logicalERD(TransformedERD* transERD, string infoName);
+
 #endif

@@ -47,4 +47,6 @@ protected:
     list<memberFunctionSchema> memberFunctionList;
 };
 
+void outputFunctionList(UD_Map* physicalERDMap, string functionList);
+
 #endif

@@ -1200,3 +1200,122 @@ TransformedERD* embedding(ERD* erd, string embeddingScript)
     
     return transERD;
 }
+
+void speicalizedERD(ERD* erd, string embeddingScript, string infoName)
+{
+    ifstream embeddingInput(embeddingScript);
+    ofstream infoOutput(infoName);
+    
+    UD_Map* entityTable = erd->getEntityTable();
+    for(entityTable->begin();!entityTable->end();(*entityTable)++){
+        Entity* entity = (Entity*)(entityTable->value());
+        
+        string entityName = entity->getEntityName();
+        infoOutput << entityName+"_name " << entityName << endl;
+      
+        UD_Attribute_List* attList = entity->getAttributeList();
+        for(attList->begin();!attList->end();(*attList)++){
+            UD_universal_data name = attList->get_attribute_name_al();
+            UD_universal_data type = attList->get_attribute_value_al();
+            
+            string attrName = *(((UD_String*)(&name))->getptr());
+            string attrType = *(((UD_String*)(&type))->getptr());
+            
+            infoOutput << entityName+"_"+attrName+"_name " << attrName << endl;
+            infoOutput << entityName+"_"+attrName+"_type " << attrType << endl;
+        }
+    }
+    
+    UD_Map* relationshipTable = erd->getRelationshipTable();
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        Relationship* relationship = (Relationship*)(relationshipTable->value());
+        
+        string relationshipName = relationship->getRelationshipName();
+        infoOutput << relationshipName+"_name " << relationshipName << endl;
+        
+        UD_Attribute_List* roleList = relationship->getRoleList();
+        for(roleList->begin();!roleList->end();(*roleList)++){
+            Role* role = (Role*)(roleList->get_attribute_ref_al(roleList->get_attribute_name_al()));
+            UD_Attribute_List* car = (UD_Attribute_List*)(role->get_attribute_ref_al("Cardinality"));
+            UD_String* navigation = (UD_String*)(role->get_attribute_ref_al("Navigation"));
+            UD_String* min = (UD_String*)(car->get_attribute_ref_al("Minimum"));
+            UD_String* max = (UD_String*)(car->get_attribute_ref_al("Maximum"));
+            
+            string roleName = role->getRoleName();
+            string targetName = role->getEntityName();
+            string minCardi = *(min->getptr());
+            string maxCardi = *(max->getptr());
+            string navigationStr = *(navigation->getptr());
+            
+            infoOutput << relationshipName+"_"+roleName+"_name " << roleName << endl;
+            infoOutput << relationshipName+"_"+roleName+"_entityName " << targetName << endl;
+            infoOutput << relationshipName+"_"+roleName+"_minCardi " << minCardi << endl;
+            infoOutput << relationshipName+"_"+roleName+"_maxCardi " << maxCardi << endl;
+            infoOutput << relationshipName+"_"+roleName+"_navigation " << navigationStr << endl;
+
+        }
+    }
+        
+    string tmp;
+    
+    while(embeddingInput >> tmp){
+        infoOutput << tmp+"_embedding ";
+        embeddingInput >> tmp;
+        infoOutput << tmp << endl;
+    }
+}
+
+void logicalERD(TransformedERD* transERD, string infoName)
+{
+    ofstream infoOutput(infoName);
+    
+    UD_Map* entityTable = transERD->getEntityTable();
+    for(entityTable->begin();!entityTable->end();(*entityTable)++){
+        TransformedEntity* entity = (TransformedEntity*)(entityTable->value());
+        
+        string entityName = entity->getEntityName();
+        infoOutput << entityName+"_name " << entityName << endl;
+        
+        UD_Attribute_List* attList = entity->getAttributeList();
+        for(attList->begin();!attList->end();(*attList)++){
+            UD_universal_data name = attList->get_attribute_name_al();
+            UD_universal_data type = attList->get_attribute_value_al();
+            
+            string attrName = *(((UD_String*)(&name))->getptr());
+            string attrType = *(((UD_String*)(&type))->getptr());
+            
+            infoOutput << entityName+"_"+attrName+"_name " << attrName << endl;
+            infoOutput << entityName+"_"+attrName+"_type " << attrType << endl;
+        }
+        
+        UD_Attribute_List* linkSet = (UD_Attribute_List*)(entity->get_attribute_ref_al("Link_set"));
+        for(linkSet->begin();!linkSet->end();(*linkSet)++){
+            UD_universal_data tmp = linkSet->get_attribute_name_al();
+            string linkName = *(((UD_String*)(&tmp))->getptr());
+            Link* link = (Link*)(linkSet->get_attribute_ref_al(linkName));
+            string targetName = link->getTargetName();
+            
+            infoOutput << entityName+"_"+linkName+"_name " << linkName << endl;
+            infoOutput << entityName+"_"+linkName+"_targetName " << targetName << endl;
+        }
+    }
+    
+    UD_Map* relationshipTable = transERD->getRelationshipTable();
+    for(relationshipTable->begin();!relationshipTable->end();(*relationshipTable)++){
+        TransformedRelationship* relationship = (TransformedRelationship*)(relationshipTable->value());
+        
+        string relationshipName = relationship->getRelationshipName();
+        infoOutput << relationshipName+"_name " << relationshipName << endl;
+        
+        UD_Attribute_List* linkSet = (UD_Attribute_List*)(relationship->get_attribute_ref_al("Link_set"));
+        for(linkSet->begin();!linkSet->end();(*linkSet)++){
+            UD_universal_data tmp = linkSet->get_attribute_name_al();
+            string linkName = *(((UD_String*)(&tmp))->getptr());
+            Link* link = (Link*)(linkSet->get_attribute_ref_al(linkName));
+            string targetName = link->getTargetName();
+            
+            infoOutput << relationshipName+"_"+linkName+"_name " << linkName << endl;
+            infoOutput << relationshipName+"_"+linkName+"_targetName " << targetName << endl;
+        }
+    }
+}

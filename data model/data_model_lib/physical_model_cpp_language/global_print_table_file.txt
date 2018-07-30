@@ -13,7 +13,7 @@ macros						T	pre
 function_definition				T	pre
 function_interface				T	pre 
 block						T	pre 
-variable_sequence				T	pre
+variable_set				T	pre
 statement_sequence				T	pre
 variable_declaration				T	pre
 statement 					T	pre

@@ -10,32 +10,33 @@
 #include <fstream>
 #include "./data_model_lib/dataModelLib.h"
 #include "./output_generation_lib/output_generation_lib.h"
-//#include "./data_model_lib/controlFlow.h"
-//#include "./data_model_lib/controlFlow.cpp"
-
 
 using namespace std;
 
 int main()
 {
-    ERD* tmpERD = import("./erdScript/erd.txt");
-    tmpERD->dump();
+    ERD* tmpERD = import("./experiment_2/erdScript/erd.txt");
+//    tmpERD->dump();
 
-    addCardinalityToERD(tmpERD, "./erdScript/cardinality.txt");
+    addCardinalityToERD(tmpERD, "./experiment_2/erdScript/cardinality.txt");
 //    dumpCardinalityERD(tmpERD);
 
-    addNavigationToERD(tmpERD, "./erdScript/navigation.txt");
+    addNavigationToERD(tmpERD, "./experiment_2/erdScript/navigation.txt");
 //    dumpNavigationERD(tmpERD);
 
     UD_Map* record = transferToBinary(tmpERD);
 
-    directionDegeneration(tmpERD, "./decision/direction_degeneration.txt");
+    directionDegeneration(tmpERD, "./experiment_2/decision/direction_degeneration.txt");
 //    dumpNavigationERD(tmpERD);
 
-    TransformedERD* transERD = embedding(tmpERD, "./decision/embedding.txt");
+    speicalizedERD(tmpERD, "./experiment_2/decision/embedding.txt", "./experiment_2/data_access_trans1.txt");
+    TransformedERD* transERD = embedding(tmpERD, "./experiment_2/decision/embedding.txt");
+    logicalERD(transERD, "./experiment_2/data_access_trans2.txt");
+    
 //    transERD->dump();
 
     UD_Map* physicalERDMap = tansToPhysicalModel(transERD);
+    outputFunctionList(physicalERDMap, "./experiment_2/function_list.txt");
 
     node* ptree = transToParseTree(physicalERDMap);
     
@@ -76,17 +77,6 @@ int main()
     gog.output_generation(ptree);
     
     gog.output_file(true);
-//
-//    outputRealCode(ptree);
-    
-//    
-//    node* ctree = createParseTree(cfm);
-//    initialPatternTable();
-//
-//    control_flow_model* cfb = new control_flow_model();
-//    importControlModel(cfb);
-//    node* root = createParseTree(cfb);
-//    outputRealCode(root);
     
     return 0;
 }
